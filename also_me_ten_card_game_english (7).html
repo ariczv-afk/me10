@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Me Too Ten</title>
+  <style>
+    * { box-sizing: border-box; font-family: Arial, sans-serif; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #dcfce7, #86efac);
+      color: #1f2937;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 10px;
+      overflow-x: hidden;
+    }
+
+    .game {
+      width: min(1120px, 100%);
+      background: #ffffffee;
+      border-radius: 22px;
+      box-shadow: 0 14px 36px rgba(0,0,0,.16);
+      padding: 14px;
+    }
+
+    header { text-align: center; margin-bottom: 6px; }
+    h1 { margin: 0; font-size: 32px; color: #166534; }
+    .subtitle { margin-top: 3px; color: #475569; font-size: 15px; }
+
+    .scoreboard {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 7px;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .score-pill {
+      background: #e0f2fe;
+      padding: 6px 12px;
+      border-radius: 999px;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr 165px;
+      gap: 12px;
+      align-items: stretch;
+      margin-top: 10px;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-height: 430px;
+    }
+
+    .player-box {
+      background: linear-gradient(180deg, #f8fafc, #ecfdf5);
+      border: 2px solid #bbf7d0;
+      border-radius: 20px;
+      padding: 12px;
+      min-height: 185px;
+      flex: 1;
+    }
+
+    .player-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #14532d;
+      margin-bottom: 8px;
+    }
+
+    .sum {
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 999px;
+      padding: 6px 11px;
+      font-size: 16px;
+      white-space: nowrap;
+    }
+
+    .cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 110px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      width: 62px;
+      height: 86px;
+      background: white;
+      border-radius: 12px;
+      border: 3px solid #16a34a;
+      box-shadow: 0 6px 10px rgba(0,0,0,.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      font-weight: bold;
+      color: #166534;
+      position: relative;
+    }
+
+    .card::before, .card::after {
+      content: "♦";
+      position: absolute;
+      font-size: 16px;
+      color: #ef4444;
+    }
+    .card::before { top: 6px; right: 7px; }
+    .card::after { bottom: 6px; left: 7px; }
+
+    .back {
+      background: repeating-linear-gradient(45deg, #16a34a, #16a34a 8px, #22c55e 8px, #22c55e 16px);
+      color: transparent;
+      border-color: #14532d;
+    }
+    .back::before, .back::after { content: "?"; color: white; }
+
+    .action-box {
+      background: #fffdf0;
+      border: 2px solid #fde68a;
+      border-radius: 18px;
+      padding: 10px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .message {
+      min-height: 64px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #854d0e;
+      line-height: 1.35;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .controls .new { grid-column: 1 / -1; }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 10px;
+      font-size: 17px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 5px 0 rgba(0,0,0,.25);
+    }
+
+    button:active { transform: translateY(3px); box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+    .hit { background: #2563eb; }
+    .stand { background: #f97316; }
+    .new { background: #16a34a; }
+
+    .meter-panel {
+      background: #ffffffee;
+      border: 3px solid #16a34a;
+      border-radius: 20px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 8px 18px rgba(0,0,0,.10);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 430px;
+    }
+
+    .meter-panel h2 { margin: 0 0 6px; color: #166534; font-size: 18px; }
+    .meter-sum { font-size: 15px; font-weight: bold; color: #334155; margin-bottom: 8px; }
+
+    .meter-wrap {
+      position: relative;
+      width: 72px;
+      height: 270px;
+      margin: 0 auto;
+      overflow: visible;
+    }
+
+    .overflow-zone {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      top: 0;
+      height: 70px;
+      border: 3px dashed #ef4444;
+      border-bottom: none;
+      border-radius: 14px 14px 0 0;
+      background: #fff1f2;
+      overflow: hidden;
+    }
+
+    .ten-tank {
+      position: absolute;
+      left: 8px;
+      right: 8px;
+      bottom: 0;
+      height: 200px;
+      border: 5px solid #14532d;
+      border-radius: 0 0 16px 16px;
+      background: repeating-linear-gradient(to top, #fff 0, #fff 17px, #dbeafe 17px, #dbeafe 20px);
+      overflow: hidden;
+    }
+
+    .ten-fill, .overflow-fill {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      transition: height .25s ease;
+    }
+    .ten-fill { background: #22c55e; }
+    .overflow-fill { background: #ef4444; }
+
+    .ten-line {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 70px;
+      height: 7px;
+      background: #111827;
+      border-radius: 999px;
+      z-index: 5;
+    }
+
+    .label10 { position: absolute; right: 78px; top: 60px; font-weight: bold; color: #111827; }
+    .label0 { position: absolute; right: 78px; bottom: 0; font-weight: bold; color: #334155; }
+
+    .overflow-box {
+      margin-top: 8px;
+      min-height: 24px;
+      color: #dc2626;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .stats-box {
+      margin-top: 8px;
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+      border-radius: 14px;
+      padding: 8px;
+      color: #1e3a8a;
+      font-weight: bold;
+      line-height: 1.35;
+      font-size: 14px;
+      width: 100%;
+    }
+
+    .rules {
+      margin-top: 10px;
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 9px 12px;
+      color: #475569;
+      line-height: 1.4;
+      font-size: 13px;
+    }
+
+    @media (max-width: 820px) {
+      body { align-items: flex-start; }
+      .main-layout { grid-template-columns: 1fr; }
+      .column, .meter-panel { min-height: auto; }
+      .player-box { min-height: 150px; }
+      .meter-panel { order: -1; }
+      h1 { font-size: 30px; }
+      .card { width: 58px; height: 78px; font-size: 30px; }
+      .message { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <header>
+      <h1>Me Too Ten</h1>
+      <div class="subtitle">A card game for kids vs. the computer — get as close as possible to 10 without going over</div>
+    </header>
+
+    <section class="scoreboard">
+      <div class="score-pill">Child Wins: <span id="childWins">0</span></div>
+      <div class="score-pill">Computer Wins: <span id="computerWins">0</span></div>
+      <div class="score-pill">Ties: <span id="ties">0</span></div>
+    </section>
+
+    <section class="main-layout">
+      <div class="column">
+        <div class="player-box">
+          <div class="player-title"><span>Computer 🤖</span><span class="sum">Total: <span id="computerSum">?</span></span></div>
+          <div id="computerCards" class="cards"></div>
+        </div>
+      </div>
+
+      <div class="column">
+        <div class="player-box">
+          <div class="player-title"><span>Player 👦</span><span class="sum">Total: <span id="childSum">0</span></span></div>
+          <div id="childCards" class="cards"></div>
+        </div>
+
+        <div class="action-box">
+          <div class="message" id="message">Press “New Game” to begin.</div>
+          <section class="controls">
+            <button class="hit" id="hitBtn" onclick="childHit()" disabled>Take Card</button>
+            <button class="stand" id="standBtn" onclick="childStand()" disabled>Stand</button>
+            <button class="new" onclick="newGame()">New Game</button>
+          </section>
+        </div>
+      </div>
+
+      <aside class="meter-panel">
+        <h2>Ten Tank</h2>
+        <div class="meter-sum">Player Has: <span id="tenFrameSum">0</span></div>
+        <div class="meter-wrap">
+          <div class="overflow-zone"><div id="overflowFill" class="overflow-fill"></div></div>
+          <div class="ten-tank"><div id="tenFill" class="ten-fill"></div></div>
+          <div class="ten-line"></div>
+          <div class="label10">10</div>
+          <div class="label0">0</div>
+        </div>
+        <div id="overflowBox" class="overflow-box"></div>
+        <div id="statsBox" class="stats-box">Odds will appear after taking a card</div>
+      </aside>
+    </section>
+
+    <section class="rules"><strong>Rules:</strong> Each card is a number from 1 to 10. The game ends when both players stop taking cards or when someone goes over 10. The player closest to 10 without going over wins.</section>
+  </main>
+
+  <script>
+    let childCards = [], computerCards = [], gameOver = true, computerHidden = true;
+    let childWins = Number(localStorage.getItem("tenGameChildWins") || 0);
+    let computerWins = Number(localStorage.getItem("tenGameComputerWins") || 0);
+    let ties = Number(localStorage.getItem("tenGameTies") || 0);
+
+    const childCardsEl = document.getElementById("childCards");
+    const computerCardsEl = document.getElementById("computerCards");
+    const childSumEl = document.getElementById("childSum");
+    const computerSumEl = document.getElementById("computerSum");
+    const messageEl = document.getElementById("message");
+    const hitBtn = document.getElementById("hitBtn");
+    const standBtn = document.getElementById("standBtn");
+    const childWinsEl = document.getElementById("childWins");
+    const computerWinsEl = document.getElementById("computerWins");
+    const tiesEl = document.getElementById("ties");
+    const tenFrameSumEl = document.getElementById("tenFrameSum");
+    const overflowBoxEl = document.getElementById("overflowBox");
+    const statsBoxEl = document.getElementById("statsBox");
+    const tenFillEl = document.getElementById("tenFill");
+    const overflowFillEl = document.getElementById("overflowFill");
+
+    function randomCard(){ return Math.floor(Math.random() * 10) + 1; }
+    function sum(cards){ return cards.reduce((t, c) => t + c, 0); }
+
+    function renderCards(container, cards, hidden = false){
+      container.innerHTML = "";
+      cards.forEach((card, index) => {
+        const div = document.createElement("div");
+        div.className = "card";
+        if (hidden && index > 0) {
+          div.classList.add("back");
+          div.textContent = "?";
+        } else {
+          div.textContent = card;
+        }
+        container.appendChild(div);
+      });
+    }
+
+    function updateScoreboard(){
+      childWinsEl.textContent = childWins;
+      computerWinsEl.textContent = computerWins;
+      tiesEl.textContent = ties;
+      localStorage.setItem("tenGameChildWins", childWins);
+      localStorage.setItem("tenGameComputerWins", computerWins);
+      localStorage.setItem("tenGameTies", ties);
+    }
+
+    function renderMeter(){
+      const total = sum(childCards);
+      tenFrameSumEl.textContent = total;
+      tenFillEl.style.height = `${Math.min(total, 10) * 10}%`;
+      overflowFillEl.style.height = `${Math.min(Math.max(total - 10, 0) * 20, 100)}%`;
+      overflowBoxEl.textContent = total > 10 ? `Overflow: ${total - 10} over 10` : `${10 - total} to 10`;
+    }
+
+    function renderStats(){
+      const total = sum(childCards);
+      if (gameOver || childCards.length === 0) {
+        statsBoxEl.textContent = "Odds will appear after taking a card";
+        return;
+      }
+      const safe = [], bust = [];
+      for (let card = 1; card <= 10; card++) {
+        if (total + card <= 10) safe.push(card);
+        else bust.push(card);
+      }
+      statsBoxEl.innerHTML = `If you take another card:<br>Safe cards: ${safe.length ? safe.join(", ") : "none"}<br>Chance not to bust: ${safe.length * 10}%<br>Chance to bust: ${bust.length * 10}%`;
+    }
+
+    function render(){
+      renderCards(childCardsEl, childCards, false);
+      renderCards(computerCardsEl, computerCards, computerHidden && !gameOver);
+      childSumEl.textContent = sum(childCards);
+      computerSumEl.textContent = (computerHidden && !gameOver) ? "?" : sum(computerCards);
+      hitBtn.disabled = gameOver;
+      standBtn.disabled = gameOver;
+      updateScoreboard();
+      renderMeter();
+      renderStats();
+    }
+
+    function newGame(){
+      childCards = [randomCard()];
+      computerCards = [randomCard()];
+      gameOver = false;
+      computerHidden = true;
+      messageEl.textContent = "You got your first card. Check the odds: take another card or stand?";
+      render();
+    }
+
+    function childHit(){
+      if (gameOver) return;
+      childCards.push(randomCard());
+      const total = sum(childCards);
+      if (total > 10) {
+        computerHidden = false;
+        endGame("The player went over 10. The computer wins 🤖");
+        return;
+      }
+      messageEl.textContent = `You now have ${total}. Check the odds: take another card or stand?`;
+      render();
+    }
+
+    function childStand(){
+      if (gameOver) return;
+      computerHidden = false;
+      messageEl.textContent = "Now it is the computer's turn...";
+      render();
+      setTimeout(computerPlay, 700);
+    }
+
+    function computerPlay(){
+      const computerTotal = sum(computerCards);
+      const childTotal = sum(childCards);
+      const safe = [];
+      for (let card = 1; card <= 10; card++) {
+        if (computerTotal + card <= 10) safe.push(card);
+      }
+      const safeChance = safe.length / 10;
+      const shouldTake = (computerTotal <= 6 && safeChance >= 0.5) || (computerTotal < childTotal && safeChance >= 0.3);
+
+      if (shouldTake) {
+        computerCards.push(randomCard());
+        render();
+        if (sum(computerCards) > 10) setTimeout(decideWinner, 600);
+        else setTimeout(computerPlay, 700);
+      } else {
+        setTimeout(decideWinner, 600);
+      }
+    }
+
+    function decideWinner(){
+      const childTotal = sum(childCards);
+      const computerTotal = sum(computerCards);
+      if (computerTotal > 10) {
+        endGame(`The computer went over 10 with ${computerTotal}. The player wins! 🎉`);
+        return;
+      }
+      if (childTotal > computerTotal) endGame(`The player is closer to 10! ${childTotal} מול ${computerTotal}. Victory! 🎉`);
+      else if (computerTotal > childTotal) endGame(`The computer is closer to 10. ${computerTotal} מול ${childTotal}. The computer wins 🤖`);
+      else endGame(`Both players reached ${childTotal}. Tie! 🤝`);
+    }
+
+    function endGame(text){
+      gameOver = true;
+      computerHidden = false;
+      if (text.includes("player wins") || text.includes("Victory")) childWins++;
+      else if (text.includes("computer wins")) computerWins++;
+      else if (text.includes("Tie")) ties++;
+      messageEl.textContent = text;
+      render();
+    }
+
+    updateScoreboard();
+    render();
+  </script>
+</body>
+</html>
