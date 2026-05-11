@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Me Too Ten</title>
+  <title>Me Too Ten / גם אני עשר</title>
   <style>
     * { box-sizing: border-box; font-family: Arial, sans-serif; }
 
@@ -32,9 +32,35 @@
       padding: 14px;
     }
 
-    header { text-align: center; margin-bottom: 6px; }
+    header { text-align: center; margin-bottom: 6px; position: relative; }
     h1 { margin: 0; font-size: 32px; color: #166534; }
     .subtitle { margin-top: 3px; color: #475569; font-size: 15px; }
+
+    .language-toggle {
+      position: absolute;
+      top: 0;
+      inset-inline-end: 0;
+      display: flex;
+      gap: 6px;
+      background: #ecfdf5;
+      border: 2px solid #bbf7d0;
+      border-radius: 999px;
+      padding: 4px;
+    }
+
+    .language-toggle button {
+      box-shadow: none;
+      padding: 7px 10px;
+      font-size: 14px;
+      border-radius: 999px;
+      background: transparent;
+      color: #166534;
+    }
+
+    .language-toggle button.active {
+      background: #16a34a;
+      color: white;
+    }
 
     .scoreboard {
       display: flex;
@@ -127,8 +153,8 @@
       font-size: 16px;
       color: #ef4444;
     }
-    .card::before { top: 6px; right: 7px; }
-    .card::after { bottom: 6px; left: 7px; }
+    .card::before { top: 6px; inset-inline-start: 7px; }
+    .card::after { bottom: 6px; inset-inline-end: 7px; }
 
     .back {
       background: repeating-linear-gradient(45deg, #16a34a, #16a34a 8px, #22c55e 8px, #22c55e 16px);
@@ -256,8 +282,8 @@
       z-index: 5;
     }
 
-    .label10 { position: absolute; right: 78px; top: 60px; font-weight: bold; color: #111827; }
-    .label0 { position: absolute; right: 78px; bottom: 0; font-weight: bold; color: #334155; }
+    .label10 { position: absolute; inset-inline-end: 78px; top: 60px; font-weight: bold; color: #111827; }
+    .label0 { position: absolute; inset-inline-end: 78px; bottom: 0; font-weight: bold; color: #334155; }
 
     .overflow-box {
       margin-top: 8px;
@@ -267,17 +293,26 @@
       font-size: 15px;
     }
 
-    .stats-box {
+    .stats-box, .wish-box {
       margin-top: 8px;
-      background: #eff6ff;
-      border: 2px solid #bfdbfe;
       border-radius: 14px;
       padding: 8px;
-      color: #1e3a8a;
       font-weight: bold;
       line-height: 1.35;
       font-size: 14px;
       width: 100%;
+    }
+
+    .stats-box {
+      background: #eff6ff;
+      border: 2px solid #bfdbfe;
+      color: #1e3a8a;
+    }
+
+    .wish-box {
+      background: #fef9c3;
+      border: 2px solid #fde047;
+      color: #854d0e;
     }
 
     .rules {
@@ -293,6 +328,8 @@
     @media (max-width: 820px) {
       body { align-items: flex-start; padding: 6px; }
       .game { padding: 10px; border-radius: 16px; }
+      header { padding-top: 42px; }
+      .language-toggle { left: 50%; right: auto; transform: translateX(-50%); }
       .main-layout { grid-template-columns: 1fr; gap: 8px; }
       .column, .meter-panel { min-height: auto; }
       .meter-panel { order: -1; }
@@ -309,7 +346,7 @@
       button { font-size: 17px; padding: 13px 8px; }
       .meter-wrap { height: 220px; transform: scale(0.9); margin-top: -8px; margin-bottom: -10px; }
       .meter-panel h2 { font-size: 17px; }
-      .stats-box { font-size: 13px; }
+      .stats-box, .wish-box { font-size: 13px; }
       .rules { font-size: 12px; }
     }
 
@@ -330,43 +367,47 @@
 <body>
   <main class="game">
     <header>
-      <h1>Me Too Ten</h1>
-      <div class="subtitle">A card game for kids vs. the computer — get as close as possible to 10 without going over</div>
+      <div class="language-toggle">
+        <button id="enBtn" onclick="setLanguage('en')">English</button>
+        <button id="heBtn" onclick="setLanguage('he')">עברית</button>
+      </div>
+      <h1 id="title">Me Too Ten</h1>
+      <div class="subtitle" id="subtitle">A card game for kids vs. the computer — get as close as possible to 10 without going over</div>
     </header>
 
     <section class="scoreboard">
-      <div class="score-pill">Child Wins: <span id="childWins">0</span></div>
-      <div class="score-pill">Computer Wins: <span id="computerWins">0</span></div>
-      <div class="score-pill">Ties: <span id="ties">0</span></div>
+      <div class="score-pill"><span id="childWinsLabel">Child Wins</span>: <span id="childWins">0</span></div>
+      <div class="score-pill"><span id="computerWinsLabel">Computer Wins</span>: <span id="computerWins">0</span></div>
+      <div class="score-pill"><span id="tiesLabel">Ties</span>: <span id="ties">0</span></div>
     </section>
 
     <section class="main-layout">
       <div class="column">
         <div class="player-box">
-          <div class="player-title"><span>Computer 🤖</span><span class="sum">Total: <span id="computerSum">?</span></span></div>
+          <div class="player-title"><span id="computerName">Computer 🤖</span><span class="sum"><span class="totalLabel">Total</span>: <span id="computerSum">?</span></span></div>
           <div id="computerCards" class="cards"></div>
         </div>
       </div>
 
       <div class="column">
         <div class="player-box">
-          <div class="player-title"><span>Player 👦</span><span class="sum">Total: <span id="childSum">0</span></span></div>
+          <div class="player-title"><span id="playerName">Player 👦</span><span class="sum"><span class="totalLabel">Total</span>: <span id="childSum">0</span></span></div>
           <div id="childCards" class="cards"></div>
         </div>
 
         <div class="action-box">
-          <div class="message" id="message">Press “New Game” to begin.</div>
+          <div class="message" id="message"></div>
           <section class="controls">
-            <button class="hit" id="hitBtn" onclick="childHit()" disabled>Take Card</button>
-            <button class="stand" id="standBtn" onclick="childStand()" disabled>Stand</button>
-            <button class="new" onclick="newGame()">New Game</button>
+            <button class="hit" id="hitBtn" onclick="childHit()" disabled></button>
+            <button class="stand" id="standBtn" onclick="childStand()" disabled></button>
+            <button class="new" id="newBtn" onclick="newGame()"></button>
           </section>
         </div>
       </div>
 
       <aside class="meter-panel">
-        <h2>Ten Tank</h2>
-        <div class="meter-sum">Player Has: <span id="tenFrameSum">0</span></div>
+        <h2 id="tankTitle">Ten Tank</h2>
+        <div class="meter-sum"><span id="playerHasLabel">Player Has</span>: <span id="tenFrameSum">0</span></div>
         <div class="meter-wrap">
           <div class="overflow-zone"><div id="overflowFill" class="overflow-fill"></div></div>
           <div class="ten-tank"><div id="tenFill" class="ten-fill"></div></div>
@@ -375,14 +416,83 @@
           <div class="label0">0</div>
         </div>
         <div id="overflowBox" class="overflow-box"></div>
-        <div id="statsBox" class="stats-box">Odds will appear after taking a card</div>
+        <div id="statsBox" class="stats-box"></div>
+        <div id="wishBox" class="wish-box"></div>
       </aside>
     </section>
 
-    <section class="rules"><strong>Rules:</strong> Each card is a number from 1 to 10. The game ends when both players stop taking cards or when someone goes over 10. The player closest to 10 without going over wins.</section>
+    <section class="rules" id="rules"></section>
   </main>
 
   <script>
+    const text = {
+      en: {
+        title: "Me Too Ten",
+        subtitle: "A card game for kids vs. the computer — get as close as possible to 10 without going over",
+        childWins: "Child Wins",
+        computerWins: "Computer Wins",
+        ties: "Ties",
+        computer: "Computer 🤖",
+        player: "Player 👦",
+        total: "Total",
+        tank: "Ten Tank",
+        playerHas: "Player Has",
+        hit: "Take Card",
+        stand: "Stand",
+        newGame: "New Game",
+        start: "Press “New Game” to begin.",
+        oddsStart: "Odds will appear after taking a card",
+        rules: "<strong>Rules:</strong> Each card is a number from 1 to 10. The game ends when both players stop taking cards or when someone goes over 10. The player closest to 10 without going over wins.",
+        firstCard: "You got your first card. Check the odds: take another card or stand?",
+        nowHave: total => `You now have ${total}. Check the odds: take another card or stand?`,
+        playerBust: "The player went over 10. The computer wins 🤖",
+        computerTurn: "Now it is the computer's turn...",
+        computerBust: total => `The computer went over 10 with ${total}. The player wins! 🎉`,
+        playerCloser: (child, computer) => `The player is closer to 10! ${child} vs. ${computer}. Victory! 🎉`,
+        computerCloser: (computer, child) => `The computer is closer to 10. ${computer} vs. ${child}. The computer wins 🤖`,
+        tie: total => `Both players reached ${total}. Tie! 🤝`,
+        overflow: n => `Overflow: ${n} over 10`,
+        toTen: n => `${n} to 10`,
+        stats: (safe, bust) => `If you take another card:<br>Safe cards: ${safe.length ? safe.join(", ") : "none"}<br>Chance not to bust: ${safe.length * 10}%<br>Chance to bust: ${bust.length * 10}%`,
+        wish: wanted => `What card would you like to get now?<br><strong>${wanted}</strong> would get you exactly to 10 🎯`,
+        perfect: "Perfect! You reached exactly 10 🎉",
+        wentOver: "Oops... you went over 10 🚨"
+      },
+      he: {
+        title: "גם אני עשר",
+        subtitle: "משחק קלפים לילד מול המחשב — מתקרבים ל־10 בלי לעבור אותו",
+        childWins: "ניצחונות לילד",
+        computerWins: "ניצחונות למחשב",
+        ties: "תיקו",
+        computer: "המחשב 🤖",
+        player: "הילד 👦",
+        total: "סכום",
+        tank: "מיכל עשר",
+        playerHas: "לילד יש",
+        hit: "עוד קלף",
+        stand: "לעצור",
+        newGame: "משחק חדש",
+        start: "לחץ על “משחק חדש” כדי להתחיל.",
+        oddsStart: "הסיכוי יוצג אחרי קבלת קלף",
+        rules: "<strong>החוקים:</strong> כל קלף הוא מספר מ־1 עד 10. המשחק מסתיים כששני השחקנים לא רוצים עוד קלפים, או כשמישהו עבר את 10. מנצח מי שהגיע הכי קרוב ל־10 בלי לעבור.",
+        firstCard: "קיבלת קלף ראשון. בדוק את הסיכוי בצד: רוצה עוד קלף או לעצור?",
+        nowHave: total => `עכשיו יש לך ${total}. בדוק את הסיכוי: רוצה עוד קלף או לעצור?`,
+        playerBust: "הילד עבר את 10. המחשב ניצח 🤖",
+        computerTurn: "עכשיו תור המחשב...",
+        computerBust: total => `המחשב עבר את 10 עם ${total}. הילד ניצח! 🎉`,
+        playerCloser: (child, computer) => `הילד קרוב יותר ל־10! ${child} מול ${computer}. ניצחון! 🎉`,
+        computerCloser: (computer, child) => `המחשב קרוב יותר ל־10. ${computer} מול ${child}. המחשב ניצח 🤖`,
+        tie: total => `שניכם הגעתם ל־${total}. תיקו! 🤝`,
+        overflow: n => `חריגה: ${n} מעל 10`,
+        toTen: n => `${n} עד 10`,
+        stats: (safe, bust) => `אם תיקח עוד קלף:<br>בטוחים: ${safe.length ? safe.join(", ") : "אין"}<br>סיכוי לא לעבור: ${safe.length * 10}%<br>סיכוי לעבור: ${bust.length * 10}%`,
+        wish: wanted => `איזה קלף היית רוצה לקבל עכשיו?<br><strong>${wanted}</strong> יביא אותך בדיוק ל־10 🎯`,
+        perfect: "מעולה! הגעת בדיוק ל־10 🎉",
+        wentOver: "אופס... עברת את 10 🚨"
+      }
+    };
+
+    let lang = localStorage.getItem("tenGameLanguage") || ((navigator.language || "").startsWith("he") ? "he" : "en");
     let childCards = [], computerCards = [], gameOver = true, computerHidden = true;
     let childWins = Number(localStorage.getItem("tenGameChildWins") || 0);
     let computerWins = Number(localStorage.getItem("tenGameComputerWins") || 0);
@@ -395,17 +505,51 @@
     const messageEl = document.getElementById("message");
     const hitBtn = document.getElementById("hitBtn");
     const standBtn = document.getElementById("standBtn");
+    const newBtn = document.getElementById("newBtn");
     const childWinsEl = document.getElementById("childWins");
     const computerWinsEl = document.getElementById("computerWins");
     const tiesEl = document.getElementById("ties");
     const tenFrameSumEl = document.getElementById("tenFrameSum");
     const overflowBoxEl = document.getElementById("overflowBox");
     const statsBoxEl = document.getElementById("statsBox");
+    const wishBoxEl = document.getElementById("wishBox");
     const tenFillEl = document.getElementById("tenFill");
     const overflowFillEl = document.getElementById("overflowFill");
 
+    function t() { return text[lang]; }
     function randomCard(){ return Math.floor(Math.random() * 10) + 1; }
-    function sum(cards){ return cards.reduce((t, c) => t + c, 0); }
+    function sum(cards){ return cards.reduce((total, card) => total + card, 0); }
+
+    function setLanguage(newLang) {
+      lang = newLang;
+      localStorage.setItem("tenGameLanguage", lang);
+      document.documentElement.lang = lang;
+      document.documentElement.dir = lang === "he" ? "rtl" : "ltr";
+      applyLanguage();
+      render();
+    }
+
+    function applyLanguage() {
+      const copy = t();
+      document.title = copy.title;
+      document.getElementById("title").textContent = copy.title;
+      document.getElementById("subtitle").textContent = copy.subtitle;
+      document.getElementById("childWinsLabel").textContent = copy.childWins;
+      document.getElementById("computerWinsLabel").textContent = copy.computerWins;
+      document.getElementById("tiesLabel").textContent = copy.ties;
+      document.getElementById("computerName").textContent = copy.computer;
+      document.getElementById("playerName").textContent = copy.player;
+      document.querySelectorAll(".totalLabel").forEach(el => el.textContent = copy.total);
+      document.getElementById("tankTitle").textContent = copy.tank;
+      document.getElementById("playerHasLabel").textContent = copy.playerHas;
+      hitBtn.textContent = copy.hit;
+      standBtn.textContent = copy.stand;
+      newBtn.textContent = copy.newGame;
+      document.getElementById("rules").innerHTML = copy.rules;
+      document.getElementById("enBtn").classList.toggle("active", lang === "en");
+      document.getElementById("heBtn").classList.toggle("active", lang === "he");
+      if (gameOver && childCards.length === 0) messageEl.textContent = copy.start;
+    }
 
     function renderCards(container, cards, hidden = false){
       container.innerHTML = "";
@@ -436,21 +580,27 @@
       tenFrameSumEl.textContent = total;
       tenFillEl.style.height = `${Math.min(total, 10) * 10}%`;
       overflowFillEl.style.height = `${Math.min(Math.max(total - 10, 0) * 20, 100)}%`;
-      overflowBoxEl.textContent = total > 10 ? `Overflow: ${total - 10} over 10` : `${10 - total} to 10`;
+      overflowBoxEl.textContent = total > 10 ? t().overflow(total - 10) : t().toTen(10 - total);
     }
 
     function renderStats(){
       const total = sum(childCards);
       if (gameOver || childCards.length === 0) {
-        statsBoxEl.textContent = "Odds will appear after taking a card";
+        statsBoxEl.textContent = t().oddsStart;
+        wishBoxEl.textContent = lang === "he" ? "איזה קלף היית רוצה לקבל עכשיו?" : "What card would you like to get now?";
         return;
       }
+
       const safe = [], bust = [];
       for (let card = 1; card <= 10; card++) {
         if (total + card <= 10) safe.push(card);
         else bust.push(card);
       }
-      statsBoxEl.innerHTML = `If you take another card:<br>Safe cards: ${safe.length ? safe.join(", ") : "none"}<br>Chance not to bust: ${safe.length * 10}%<br>Chance to bust: ${bust.length * 10}%`;
+      statsBoxEl.innerHTML = t().stats(safe, bust);
+
+      if (total < 10) wishBoxEl.innerHTML = t().wish(10 - total);
+      else if (total === 10) wishBoxEl.innerHTML = t().perfect;
+      else wishBoxEl.innerHTML = t().wentOver;
     }
 
     function render(){
@@ -470,7 +620,7 @@
       computerCards = [randomCard()];
       gameOver = false;
       computerHidden = true;
-      messageEl.textContent = "You got your first card. Check the odds: take another card or stand?";
+      messageEl.textContent = t().firstCard;
       render();
     }
 
@@ -480,17 +630,17 @@
       const total = sum(childCards);
       if (total > 10) {
         computerHidden = false;
-        endGame("The player went over 10. The computer wins 🤖");
+        endGame(t().playerBust, "computer");
         return;
       }
-      messageEl.textContent = `You now have ${total}. Check the odds: take another card or stand?`;
+      messageEl.textContent = t().nowHave(total);
       render();
     }
 
     function childStand(){
       if (gameOver) return;
       computerHidden = false;
-      messageEl.textContent = "Now it is the computer's turn...";
+      messageEl.textContent = t().computerTurn;
       render();
       setTimeout(computerPlay, 700);
     }
@@ -519,21 +669,21 @@
       const childTotal = sum(childCards);
       const computerTotal = sum(computerCards);
       if (computerTotal > 10) {
-        endGame(`The computer went over 10 with ${computerTotal}. The player wins! 🎉`);
+        endGame(t().computerBust(computerTotal), "child");
         return;
       }
-      if (childTotal > computerTotal) endGame(`The player is closer to 10! ${childTotal} מול ${computerTotal}. Victory! 🎉`);
-      else if (computerTotal > childTotal) endGame(`The computer is closer to 10. ${computerTotal} מול ${childTotal}. The computer wins 🤖`);
-      else endGame(`Both players reached ${childTotal}. Tie! 🤝`);
+      if (childTotal > computerTotal) endGame(t().playerCloser(childTotal, computerTotal), "child");
+      else if (computerTotal > childTotal) endGame(t().computerCloser(computerTotal, childTotal), "computer");
+      else endGame(t().tie(childTotal), "tie");
     }
 
-    function endGame(text){
+    function endGame(message, result){
       gameOver = true;
       computerHidden = false;
-      if (text.includes("player wins") || text.includes("Victory")) childWins++;
-      else if (text.includes("computer wins")) computerWins++;
-      else if (text.includes("Tie")) ties++;
-      messageEl.textContent = text;
+      if (result === "child") childWins++;
+      else if (result === "computer") computerWins++;
+      else if (result === "tie") ties++;
+      messageEl.textContent = message;
       render();
     }
 
@@ -546,6 +696,7 @@
     window.addEventListener("orientationchange", detectDeviceMode);
 
     detectDeviceMode();
+    applyLanguage();
     updateScoreboard();
     render();
   </script>
