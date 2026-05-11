@@ -187,9 +187,9 @@
 
     .bottom-row {
       display: grid;
-      grid-template-columns: 1fr 360px;
+      grid-template-columns: 1fr 300px;
       gap: 14px;
-      align-items: stretch;
+      align-items: start;
     }
 
     .message {
@@ -346,13 +346,16 @@
 
         <section class="thinking-box hidden-box" id="thinkingBox"></section>
 
+        <section class="controls" style="max-width:520px;margin:0 auto;width:100%;">
+          <button class="hit" id="hitBtn" onclick="childHit()" disabled>Take Card</button>
+          <button class="stand" id="standBtn" onclick="childStand()" disabled>Stand</button>
+          <button class="new" id="newBtn" onclick="newGame()">New Game</button>
+        </section>
+
         <section class="bottom-row">
           <div class="message" id="message"></div>
-          <div class="controls">
-            <button class="hit" id="hitBtn" onclick="childHit()" disabled>Take Card</button>
-            <button class="stand" id="standBtn" onclick="childStand()" disabled>Stand</button>
-            <button class="new" id="newBtn" onclick="newGame()">New Game</button>
-          </div>
+          <div class="message" id="message"></div>
+          <div id="statsBox" class="stats-box"></div>
         </section>
       </div>
 
@@ -395,7 +398,7 @@
         rules: "<strong>Rules:</strong> Each card is a number from 1 to 10. The game ends when both players stop taking cards or when someone goes over 10. The player closest to 10 without going over wins.",
         firstCard: "You got your first card. Think first, then decide: take another card or stand?",
         nowHave: total => `You now have ${total}. Think first, then decide.` ,
-        thinking: wanted => `🎯 What card would you like to get now?<br><div style="font-size:2.2em;margin-top:10px;color:#b45309">${wanted}</div><div style="font-size:.7em;margin-top:6px">This would get you exactly to 10</div>`,
+        thinking: wanted => `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%"><div style="font-size:.95em">🎯 What card would you like to get now?</div><div style="font-size:2.8em;color:#b45309;line-height:1">${wanted}</div><div style="font-size:.72em;color:#92400e">This would get you exactly to 10</div></div>`, 
         perfectThinking: "You reached exactly 10. Great stop point! 🎉",
         playerBust: "The player went over 10. The computer wins 🤖",
         computerTurn: "Now it is the computer's turn...",
@@ -426,7 +429,7 @@
         rules: "<strong>החוקים:</strong> כל קלף הוא מספר מ־1 עד 10. המשחק מסתיים כששני השחקנים לא רוצים עוד קלפים, או כשמישהו עבר את 10. מנצח מי שהגיע הכי קרוב ל־10 בלי לעבור.",
         firstCard: "קיבלת קלף ראשון. קודם חושבים, ואז מחליטים: עוד קלף או לעצור?",
         nowHave: total => `עכשיו יש לך ${total}. קודם חושבים, ואז מחליטים.` ,
-        thinking: wanted => `🎯 איזה קלף היית רוצה לקבל עכשיו?<br><div style="font-size:2.2em;margin-top:10px;color:#b45309">${wanted}</div><div style="font-size:.7em;margin-top:6px">יביא אותך בדיוק ל־10</div>`,
+        thinking: wanted => `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;direction:rtl"><div style="font-size:.95em">🎯 איזה קלף היית רוצה לקבל עכשיו?</div><div style="font-size:2.8em;color:#b45309;line-height:1">${wanted}</div><div style="font-size:.72em;color:#92400e">יביא אותך בדיוק ל־10</div></div>`, 
         perfectThinking: "הגעת בדיוק ל־10. נקודת עצירה מצוינת! 🎉",
         playerBust: "הילד עבר את 10. המחשב ניצח 🤖",
         computerTurn: "עכשיו תור המחשב...",
