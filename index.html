@@ -1,496 +1,156 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title> עד עשר </title>
+<script>
+  let childSum = 0;
+  let computerSum = 0;
+  let childWins = 0;
+  let computerWins = 0;
+  let ties = 0;
+  let gameOver = false;
 
-  <style>
-    * { box-sizing: border-box; }
+  const el = id => document.getElementById(id);
 
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: linear-gradient(90deg, #a8f0c3, #f8fff9, #a8f0c3);
-      color: #063b1d;
+  function randomCard() {
+    return Math.floor(Math.random() * 10) + 1;
+  }
+
+  function updateUI() {
+    el("childSum").textContent = childSum;
+    el("computerSum").textContent = computerSum;
+    el("meterSum").textContent = childSum;
+    el("fill").style.height = Math.min(childSum, 10) * 10 + "%";
+
+    const safeCards = Math.max(0, 10 - childSum);
+    const probability = Math.round((safeCards / 10) * 100);
+
+    el("probability").textContent = probability + "%";
+    el("probText").textContent =
+      safeCards > 0 ? `מספרים 1–${safeCards}` : "אין קלף בטוח";
+
+    el("childWins").textContent = childWins;
+    el("computerWins").textContent = computerWins;
+    el("ties").textContent = ties;
+  }
+
+  function startRound() {
+    gameOver = false;
+
+    childSum = randomCard();
+    computerSum = randomCard();
+
+    el("childCard").textContent = childSum;
+    el("computerCard").textContent = computerSum;
+    el("wish").value = "";
+
+    updateUI();
+
+    if (childSum === 10) return endGame("child", "הילד התחיל עם 10 בדיוק! ניצחת!");
+    if (computerSum === 10) return endGame("computer", "המחשב התחיל עם 10 בדיוק. המחשב ניצח.");
+
+    el("message").textContent = "איזה קלף יביא אותך הכי קרוב ל־10?";
+  }
+
+  function childDraw() {
+    if (gameOver) return;
+
+    const wish = el("wish").value;
+    if (!wish) {
+      el("message").textContent = "קודם בחר איזה קלף היית רוצה לקבל";
+      return;
     }
 
-    .app {
-      width: min(1500px, 98vw);
-      min-height: 94vh;
-      margin: 2vh auto;
-      padding: 18px;
-      background: rgba(255,255,255,.94);
-      border-radius: 28px;
-      display: grid;
-      grid-template-columns: 250px 1fr;
-      gap: 18px;
+    const needed = 10 - childSum;
+
+    if (Number(wish) === needed) {
+      el("message").textContent =
+        "נכון! הקלף הזה יביא אותך בדיוק לעשר. בוא נראה מה הקלף הבא שיצא...";
+    } else if (Number(wish) < needed) {
+      el("message").textContent =
+        "זה קלף בטוח, אבל הוא עדיין לא יביא אותך בדיוק לעשר. בוא נראה מה יצא...";
+    } else {
+      el("message").textContent =
+        "שים לב: אם תקבל את הקלף הזה, תעבור את עשר. בוא נראה מה יצא...";
     }
 
-    .main {
-      display: grid;
-      grid-template-rows: auto auto auto auto;
-      gap: 16px;
-      min-width: 0;
-    }
-
-    .top {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 14px;
-    }
-
-    .box {
-      background: #f8fffa;
-      border: 2px solid #d4f3dc;
-      border-radius: 18px;
-      padding: 14px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: 900;
-      min-height: 90px;
-      display: grid;
-      place-items: center;
-    }
-
-    .boards {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
-
-    .player {
-      min-height: 300px;
-      border: 2px solid #8bebaa;
-      border-radius: 24px;
-      background: linear-gradient(135deg, white, #effcf5);
-      padding: 20px;
-      position: relative;
-      display: grid;
-      grid-template-columns: 1fr 180px;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .player h2 {
-      position: absolute;
-      top: 20px;
-      right: 28px;
-      margin: 0;
-      font-size: 36px;
-    }
-
-    .sum {
-      position: absolute;
-      top: 24px;
-      left: 28px;
-      background: #dff8e8;
-      border-radius: 16px;
-      padding: 12px 28px;
-      font-size: 30px;
-      font-weight: 900;
-    }
-
-    .card {
-      width: 150px;
-      height: 210px;
-      border: 6px solid #079845;
-      border-radius: 22px;
-      background: white;
-      display: grid;
-      place-items: center;
-      font-size: 78px;
-      font-weight: 900;
-      color: #087032;
-      margin: 48px auto 0;
-      box-shadow: 0 14px 28px rgba(0,0,0,.16);
-      position: relative;
-    }
-
-    .card::before {
-      content: "♦";
-      position: absolute;
-      top: 12px;
-      left: 16px;
-      color: #ff3045;
-      font-size: 24px;
-    }
-
-    .card::after {
-      content: "♦";
-      position: absolute;
-      bottom: 12px;
-      right: 16px;
-      color: #ff3045;
-      font-size: 24px;
-    }
-
-    .prob {
-      background: #dff8e8;
-      border-radius: 18px;
-      padding: 18px 10px;
-      text-align: center;
-      font-weight: 900;
-      font-size: 22px;
-      line-height: 1.35;
-      margin-top: 55px;
-    }
-
-    .prob strong {
-      display: block;
-      font-size: 48px;
-      margin: 8px 0;
-    }
-
-    .question {
-      border: 3px solid #f3a000;
-      border-radius: 24px;
-      background: linear-gradient(135deg, #fffdfa, #fff4c9);
-      padding: 20px;
-      text-align: center;
-      color: #7a390f;
-    }
-
-    .question h2 {
-      margin: 0 0 8px;
-      font-size: 34px;
-    }
-
-    select {
-      width: 330px;
-      max-width: 90%;
-      font-size: 26px;
-      font-weight: 900;
-      padding: 12px;
-      border-radius: 14px;
-      border: 3px solid #08a24d;
-      background: white;
-      text-align: center;
-    }
-
-    .message {
-      margin-top: 10px;
-      min-height: 30px;
-      font-size: 24px;
-      font-weight: 900;
-    }
-
-    .actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 18px;
-      padding: 14px;
-      border: 2px solid #e4e4e4;
-      border-radius: 22px;
-      background: rgba(255,255,255,.8);
-    }
-
-    button {
-      border: none;
-      border-radius: 18px;
-      padding: 18px 10px;
-      font-size: 28px;
-      font-weight: 900;
-      color: white;
-      cursor: pointer;
-      box-shadow: inset 0 -5px 0 rgba(0,0,0,.18);
-    }
-
-    button small {
-      display: block;
-      font-size: 18px;
-      margin-top: 6px;
-    }
-
-    .draw { background: #2563eb; }
-    .stop { background: #f97316; }
-    .new { background: #16a34a; }
-
-    .meterBox {
-      border: 4px solid #079845;
-      border-radius: 24px;
-      background: white;
-      padding: 22px 12px;
-      text-align: center;
-      font-size: 24px;
-      font-weight: 900;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .tubeWrap {
-      display: grid;
-      grid-template-columns: 40px 90px;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .tube {
-      width: 70px;
-      height: 360px;
-      border: 7px solid #076b36;
-      border-radius: 28px;
-      position: relative;
-      overflow: hidden;
-      background: repeating-linear-gradient(to top, #fff 0 36px, #dcecff 38px 40px);
-    }
-
-    .fill {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 0%;
-      background: linear-gradient(#21cf62, #12a84d);
-      transition: height .4s;
-    }
-
-    .labels {
-      height: 360px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      color: #0f172a;
-    }
-
-    .red { color: red; }
-
-    @media (max-width: 950px) {
-      .app {
-        grid-template-columns: 1fr;
-      }
-
-      .meterBox {
-        order: 2;
-      }
-
-      .top,
-      .boards,
-      .actions {
-        grid-template-columns: 1fr;
-      }
-
-      .player {
-        grid-template-columns: 1fr;
-      }
-
-      .prob {
-        margin-top: 0;
-      }
-    }
-  </style>
-</head>
-
-<body>
-  <main class="app">
-
-    <aside class="meterBox">
-      <div>מיכל עשר</div>
-      <div>לילד יש: <span id="meterSum">0</span></div>
-
-      <div class="tubeWrap">
-        <div class="labels">
-          <span>10</span>
-          <span>0</span>
-        </div>
-
-        <div class="tube">
-          <div class="fill" id="fill"></div>
-        </div>
-      </div>
-
-      <div class="red">עד 10</div>
-    </aside>
-
-    <section class="main">
-
-      <section class="top">
-        <div class="box">💡<br>בחר את המספר<br>שהיית רוצה לקבל</div>
-        <div class="box">🎯 המטרה:<br>להגיע ל־10 בדיוק!</div>
-        <div class="box">תיקו: <span id="ties">0</span></div>
-        <div class="box">🏆 ניצחונות למחשב:<br><span id="computerWins">0</span></div>
-        <div class="box">📖 ניצחונות לילד:<br><span id="childWins">0</span></div>
-      </section>
-
-      <section class="boards">
-        <div class="player">
-          <h2>המחשב 🤖</h2>
-          <div class="sum">סכום: <span id="computerSum">0</span></div>
-          <div class="card" id="computerCard">?</div>
-          <div></div>
-        </div>
-
-        <div class="player">
-          <h2>הילד 👦</h2>
-          <div class="sum">סכום: <span id="childSum">0</span></div>
-          <div class="card" id="childCard">?</div>
-
-          <div class="prob">
-            הסתברות<br>לקלף הבא:
-            <strong id="probability">100%</strong>
-            <small id="probText">מספרים 1–10</small>
-          </div>
-        </div>
-      </section>
-
-      <section class="question">
-        <h2>🎯 איזה קלף היית רוצה לקבל עכשיו?</h2>
-        <div>בחר מספר בין 1 ל־10</div>
-
-        <select id="wish">
-          <option value="">בחר מספר...</option>
-          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
-        </select>
-
-        <div class="message" id="message">תור הילד</div>
-      </section>
-
-      <section class="actions">
-        <button class="draw" onclick="childDraw()">👂 עוד קלף<small>אני רוצה קלף נוסף</small></button>
-        <button class="stop" onclick="childStop()">✋ לעצור<small>זה המספר שבחרתי</small></button>
-        <button class="new" onclick="newGame()">✨ משחק חדש<small>מתחילים מהתחלה</small></button>
-      </section>
-
-    </section>
-  </main>
-
-  <script>
-    let childSum = 0;
-    let computerSum = 0;
-    let childWins = 0;
-    let computerWins = 0;
-    let ties = 0;
-    let gameOver = false;
-
-    const el = id => document.getElementById(id);
-
-    function randomCard() {
-      return Math.floor(Math.random() * 10) + 1;
-    }
-
-    function updateUI() {
-      el("childSum").textContent = childSum;
-      el("computerSum").textContent = computerSum;
-      el("meterSum").textContent = childSum;
-
-      el("fill").style.height = Math.min(childSum, 10) * 10 + "%";
-
-      const safeCards = Math.max(0, 10 - childSum);
-      const probability = Math.round((safeCards / 10) * 100);
-
-      el("probability").textContent = probability + "%";
-      el("probText").textContent =
-        safeCards > 0 ? `מספרים 1–${safeCards}` : "אין קלף בטוח";
-
-      el("childWins").textContent = childWins;
-      el("computerWins").textContent = computerWins;
-      el("ties").textContent = ties;
-    }
-
-    function childDraw() {
-      if (gameOver) return;
-
-      const wish = el("wish").value;
-      if (!wish) {
-        el("message").textContent = "קודם בחר איזה קלף היית רוצה לקבל";
-        return;
-      }
-
+    setTimeout(() => {
       const card = randomCard();
       childSum += card;
       el("childCard").textContent = card;
-
-      el("message").textContent =
-        String(card) === wish
-          ? "יפה! קיבלת בדיוק את הקלף שבחרת"
-          : `קיבלת ${card}. עכשיו תור המחשב`;
-
       el("wish").value = "";
       updateUI();
 
-      if (childSum === 10) return endGame("child", "הגעת בדיוק ל־10! ניצחת!");
-      if (childSum > 10) return endGame("computer", "עברת את 10. המחשב ניצח.");
-
-      setTimeout(computerTurn, 700);
-    }
-
-    function computerTurn() {
-      if (gameOver) return;
-
-      const card = randomCard();
-      computerSum += card;
-      el("computerCard").textContent = card;
-
-      updateUI();
-
-      if (computerSum === 10) return endGame("computer", "המחשב הגיע בדיוק ל־10.");
-      if (computerSum > 10) return endGame("child", "המחשב עבר את 10. הילד ניצח!");
-
-      el("message").textContent = "תור הילד";
-    }
-
-    function childStop() {
-      if (gameOver) return;
-
-      el("message").textContent = "הילד עצר. המחשב משחק...";
-
-      setTimeout(() => {
-        while (computerSum < childSum && computerSum < 10) {
-          const card = randomCard();
-          computerSum += card;
-          el("computerCard").textContent = card;
-
-          if (computerSum >= 10) break;
-        }
-
-        updateUI();
-        decideWinner();
-      }, 700);
-    }
-
-    function decideWinner() {
-      if (childSum > 10) return endGame("computer", "הילד עבר את 10. המחשב ניצח.");
-      if (computerSum > 10) return endGame("child", "המחשב עבר את 10. הילד ניצח!");
-
-      const childDistance = Math.abs(10 - childSum);
-      const computerDistance = Math.abs(10 - computerSum);
-
-      if (childDistance < computerDistance) {
-        endGame("child", "הילד קרוב יותר ל־10. ניצחת!");
-      } else if (computerDistance < childDistance) {
-        endGame("computer", "המחשב קרוב יותר ל־10.");
-      } else {
-        endGame("tie", "תיקו! שניכם באותו מרחק מ־10.");
+      if (childSum === 10) {
+        return endGame("child", "הילד הגיע בדיוק ל־10! ניצחת!");
       }
+
+      if (childSum > 10) {
+        return endGame("computer", "הילד עבר את 10. המחשב ניצח.");
+      }
+
+      el("message").textContent = `יצא לך ${card}. עכשיו תור המחשב.`;
+
+      setTimeout(computerTurn, 800);
+    }, 900);
+  }
+
+  function computerTurn() {
+    if (gameOver) return;
+
+    const card = randomCard();
+    computerSum += card;
+    el("computerCard").textContent = card;
+    updateUI();
+
+    if (computerSum === 10) {
+      return endGame("computer", "המחשב הגיע בדיוק ל־10. המחשב ניצח.");
     }
 
-    function endGame(winner, text) {
-      gameOver = true;
-      el("message").textContent = text;
-
-      if (winner === "child") childWins++;
-      if (winner === "computer") computerWins++;
-      if (winner === "tie") ties++;
-
-      updateUI();
+    if (computerSum > 10) {
+      return endGame("child", "המחשב עבר את 10. הילד ניצח!");
     }
 
-    function newGame() {
-      childSum = 0;
-      computerSum = 0;
-      gameOver = false;
+    el("message").textContent = "תור הילד: איזה קלף היית רוצה לקבל עכשיו?";
+  }
 
-      el("childCard").textContent = "?";
-      el("computerCard").textContent = "?";
-      el("wish").value = "";
-      el("message").textContent = "תור הילד";
+  function childStop() {
+    if (gameOver) return;
 
-      updateUI();
+    decideWinner();
+  }
+
+  function decideWinner() {
+    if (childSum > 10) return endGame("computer", "הילד עבר את 10. המחשב ניצח.");
+    if (computerSum > 10) return endGame("child", "המחשב עבר את 10. הילד ניצח!");
+
+    const childDistance = Math.abs(10 - childSum);
+    const computerDistance = Math.abs(10 - computerSum);
+
+    if (childDistance < computerDistance) {
+      endGame("child", "הילד עצר קרוב יותר ל־10. הילד ניצח!");
+    } else if (computerDistance < childDistance) {
+      endGame("computer", "המחשב קרוב יותר ל־10. המחשב ניצח.");
+    } else {
+      endGame("tie", "תיקו! שניכם באותו מרחק מ־10.");
     }
+  }
+
+  function endGame(winner, text) {
+    gameOver = true;
+    el("message").textContent = text;
+
+    if (winner === "child") childWins++;
+    if (winner === "computer") computerWins++;
+    if (winner === "tie") ties++;
 
     updateUI();
-  </script>
-</body>
-</html>
+
+    setTimeout(() => {
+      const startNew = confirm(text + "\n\nרוצה להתחיל משחק חדש?");
+      if (startNew) startRound();
+    }, 250);
+  }
+
+  function newGame() {
+    startRound();
+  }
+
+  startRound();
+</script>
