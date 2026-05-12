@@ -1,657 +1,499 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Me Too Ten</title>
+  <title>מיכל עשר</title>
   <style>
-    * { box-sizing: border-box; font-family: Arial, sans-serif; }
-
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      min-height: 100vh;
-      background: radial-gradient(circle at top, #dcfce7, #86efac);
-      color: #1f2937;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 10px;
-      overflow-x: hidden;
+      font-family: Arial, "Rubik", sans-serif;
+      background: linear-gradient(90deg,#a8f0c3,#f8fff9,#a8f0c3);
+      color: #063b1d;
+      overflow: hidden;
     }
 
-    .game {
-      width: min(1180px, 100%);
-      background: #ffffffee;
-      border-radius: 24px;
-      box-shadow: 0 18px 42px rgba(0,0,0,.18);
-      padding: 16px;
-    }
-
-    header {
+    .app {
+      width: min(1380px, 98vw);
+      height: 96vh;
+      margin: 2vh auto;
+      background: rgba(255,255,255,.92);
+      border-radius: 28px;
+      padding: 18px 22px;
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .title-box { text-align: center; grid-column: 2; }
-    h1 { margin: 0; font-size: 36px; color: #166534; }
-    .subtitle { margin-top: 3px; color: #475569; font-size: 15px; }
-
-    .language-toggle {
-      justify-self: end;
-      display: flex;
-      gap: 6px;
-      background: #ecfdf5;
-      border: 2px solid #bbf7d0;
-      border-radius: 999px;
-      padding: 4px;
-    }
-
-    .language-toggle button {
-      box-shadow: none;
-      padding: 7px 10px;
-      font-size: 14px;
-      border-radius: 999px;
-      background: transparent;
-      color: #166534;
-    }
-
-    .language-toggle button.active { background: #16a34a; color: white; }
-
-    .scoreboard {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-      font-weight: bold;
-      font-size: 15px;
-    }
-
-    .score-pill { background: #e0f2fe; padding: 7px 13px; border-radius: 999px; }
-
-    .main-layout {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 190px;
+      grid-template-columns: 1fr 250px;
+      grid-template-rows: auto 1fr auto;
       gap: 14px;
-      align-items: stretch;
+      box-shadow: 0 20px 50px rgba(0,0,0,.12);
     }
 
-    .table-area {
+    .top {
+      grid-column: 1 / 3;
       display: grid;
-      grid-template-rows: auto auto auto;
-      gap: 12px;
-      min-height: 520px;
+      grid-template-columns: 1.2fr 1.2fr .8fr .8fr .8fr;
+      gap: 14px;
+      align-items: center;
     }
 
-    .players-row {
+    .pill, .goal, .hint {
+      background: #f5fbf7;
+      border: 2px solid #d8f3e0;
+      border-radius: 18px;
+      padding: 13px 18px;
+      text-align: center;
+      font-size: clamp(18px, 1.8vw, 26px);
+      font-weight: 800;
+    }
+
+    .hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      color: #7a390f;
+    }
+
+    .hint .icon, .goal .icon { font-size: 40px; }
+
+    .boards {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
+      gap: 18px;
+      min-height: 0;
     }
 
-    .player-box {
-      background: linear-gradient(180deg, #f8fafc, #ecfdf5);
-      border: 2px solid #bbf7d0;
-      border-radius: 22px;
-      padding: 14px;
-      min-height: 245px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .player-title {
-      display: flex;
+    .panel {
+      position: relative;
+      background: linear-gradient(135deg,#ffffff,#effcf5);
+      border: 2px solid #a8edbd;
+      border-radius: 24px;
+      padding: 22px;
+      display: grid;
+      grid-template-columns: 1fr 170px;
       align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 23px;
-      font-weight: bold;
-      color: #14532d;
-      margin-bottom: 10px;
+      min-height: 260px;
     }
 
-    .sum {
-      background: #dcfce7;
-      color: #166534;
-      border-radius: 999px;
-      padding: 7px 13px;
-      font-size: 18px;
-      white-space: nowrap;
+    .title {
+      position: absolute;
+      top: 22px;
+      right: 28px;
+      font-size: clamp(26px, 2.3vw, 38px);
+      font-weight: 900;
     }
 
-    .cards {
-      flex: 1;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      min-height: 150px;
-      align-items: center;
-      justify-content: center;
+    .badge {
+      position: absolute;
+      top: 24px;
+      left: 28px;
+      background: #dff8e8;
+      border-radius: 16px;
+      padding: 12px 24px;
+      font-size: clamp(20px, 2vw, 30px);
+      font-weight: 900;
     }
 
     .card {
-      width: 108px;
-      height: 148px;
+      width: 150px;
+      height: 210px;
+      border: 6px solid #079845;
+      border-radius: 22px;
       background: white;
-      border-radius: 18px;
-      border: 4px solid #16a34a;
-      box-shadow: 0 10px 18px rgba(0,0,0,.16);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 58px;
-      font-weight: bold;
-      color: #166534;
+      margin: 50px auto 0;
+      display: grid;
+      place-items: center;
+      font-size: 76px;
+      font-weight: 900;
+      color: #087032;
+      box-shadow: 0 14px 28px rgba(0,0,0,.16);
       position: relative;
     }
 
-    .card::before, .card::after {
+    .card::before {
       content: "♦";
       position: absolute;
-      font-size: 18px;
-      color: #ef4444;
+      top: 12px;
+      left: 18px;
+      color: #ff3045;
+      font-size: 24px;
     }
-    .card::before { top: 8px; inset-inline-start: 9px; }
-    .card::after { bottom: 8px; inset-inline-end: 9px; }
 
-    .back {
-      background: repeating-linear-gradient(45deg, #16a34a, #16a34a 8px, #22c55e 8px, #22c55e 16px);
-      color: transparent;
-      border-color: #14532d;
+    .card::after {
+      content: "♦";
+      position: absolute;
+      bottom: 12px;
+      right: 18px;
+      color: #ff3045;
+      font-size: 24px;
     }
-    .back::before, .back::after { content: "?"; color: white; }
 
-    .thinking-box {
-      background: linear-gradient(180deg, #fff7ed, #fef3c7);
-      border: 4px solid #f59e0b;
-      border-radius: 30px;
-      padding: 24px;
-      min-height: 145px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .prob {
+      background: #dff8e8;
+      border-radius: 18px;
+      padding: 18px 12px;
       text-align: center;
+      font-weight: 900;
+      font-size: 22px;
+      color: #09642e;
+      line-height: 1.35;
+    }
+
+    .prob strong {
+      display: block;
+      font-size: 48px;
+      margin: 8px 0;
+    }
+
+    .ask {
+      background: linear-gradient(135deg,#fffdfa,#fff4c9);
+      border: 3px solid #f3a000;
+      border-radius: 24px;
+      padding: 20px;
+      text-align: center;
+      color: #7a390f;
+      display: grid;
+      place-items: center;
+      gap: 8px;
+      min-height: 170px;
+    }
+
+    .ask h2 {
+      margin: 0;
+      font-size: clamp(26px, 2.4vw, 40px);
+    }
+
+    select {
+      width: min(360px, 85%);
       font-size: 28px;
       font-weight: 900;
-      color: #7c2d12;
-      line-height: 1.4;
-      box-shadow: 0 12px 26px rgba(245,158,11,.28);
-    }
-
-    .thinking-box.hidden-box {
-      visibility: hidden;
-    }
-
-    .bottom-row {
-      display: grid;
-      grid-template-columns: 1fr 300px;
-      gap: 14px;
-      align-items: start;
-    }
-
-    .message {
-      background: #fefce8;
-      border: 2px solid #fde68a;
-      border-radius: 18px;
       padding: 14px;
-      min-height: 96px;
+      border-radius: 14px;
+      border: 3px solid #08a24d;
       text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      color: #854d0e;
-      line-height: 1.35;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: white;
     }
 
-    .controls {
-      background: #f8fafc;
-      border: 2px solid #e2e8f0;
-      border-radius: 18px;
-      padding: 12px;
+    .actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      align-content: center;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      padding: 14px;
+      background: rgba(255,255,255,.75);
+      border: 2px solid #e4e4e4;
+      border-radius: 22px;
     }
-
-    .controls .new { grid-column: 1 / -1; }
 
     button {
       border: none;
-      border-radius: 16px;
-      padding: 14px 12px;
-      font-size: 19px;
-      font-weight: bold;
+      border-radius: 18px;
+      padding: 18px 10px;
+      font-size: clamp(20px, 2vw, 30px);
+      font-weight: 900;
       color: white;
       cursor: pointer;
-      box-shadow: 0 6px 0 rgba(0,0,0,.25);
+      box-shadow: inset 0 -5px 0 rgba(0,0,0,.18);
     }
 
-    button:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0,0,0,.25); }
-    button:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-    .hit { background: #2563eb; }
-    .stand { background: #f97316; }
+    .draw { background: #2563eb; }
+    .stop { background: #f97316; }
     .new { background: #16a34a; }
 
-    .meter-panel {
-      background: #ffffffee;
-      border: 3px solid #16a34a;
-      border-radius: 22px;
-      padding: 12px;
-      text-align: center;
-      box-shadow: 0 8px 18px rgba(0,0,0,.10);
+    .meterBox {
+      grid-column: 2;
+      grid-row: 2 / 4;
+      border: 4px solid #079845;
+      border-radius: 24px;
+      background: white;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 24px 12px;
+      gap: 12px;
+      font-size: 24px;
+      font-weight: 900;
     }
 
-    .meter-panel h2 { margin: 0 0 8px; color: #166534; font-size: 20px; }
-    .meter-sum { font-size: 16px; font-weight: bold; color: #334155; margin-bottom: 10px; }
+    .tubeWrap {
+      display: grid;
+      grid-template-columns: 40px 90px;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+    }
 
-    .meter-wrap { position: relative; width: 86px; height: 300px; margin: 0 auto; overflow: visible; }
-    .overflow-zone { position: absolute; left: 10px; right: 10px; top: 0; height: 78px; border: 3px dashed #ef4444; border-bottom: none; border-radius: 15px 15px 0 0; background: #fff1f2; overflow: hidden; }
-    .ten-tank { position: absolute; left: 10px; right: 10px; bottom: 0; height: 222px; border: 6px solid #14532d; border-radius: 0 0 18px 18px; background: repeating-linear-gradient(to top, #fff 0, #fff 19px, #dbeafe 19px, #dbeafe 22px); overflow: hidden; }
-    .ten-fill, .overflow-fill { position: absolute; bottom: 0; left: 0; right: 0; transition: height .25s ease; }
-    .ten-fill { background: #22c55e; }
-    .overflow-fill { background: #ef4444; }
-    .ten-line { position: absolute; left: 0; right: 0; top: 78px; height: 8px; background: #111827; border-radius: 999px; z-index: 5; }
-    .label10 { position: absolute; inset-inline-end: 92px; top: 68px; font-weight: bold; color: #111827; }
-    .label0 { position: absolute; inset-inline-end: 92px; bottom: 0; font-weight: bold; color: #334155; }
+    .tube {
+      width: 70px;
+      height: 360px;
+      border: 7px solid #076b36;
+      border-radius: 28px;
+      position: relative;
+      overflow: hidden;
+      background: repeating-linear-gradient(to top,#fff 0 36px,#dcecff 38px 40px);
+    }
 
-    .overflow-box { margin-top: 10px; min-height: 24px; color: #dc2626; font-weight: bold; font-size: 15px; }
-
-    .stats-box {
-      margin-top: 12px;
-      background: #eff6ff;
-      border: 2px solid #93c5fd;
-      border-radius: 16px;
-      padding: 12px;
-      color: #1e3a8a;
-      font-weight: bold;
-      line-height: 1.6;
-      font-size: 16px;
+    .fill {
+      position: absolute;
+      bottom: 0;
       width: 100%;
+      background: linear-gradient(#21cf62,#12a84d);
+      transition: height .4s;
     }
 
-    .rules {
-      margin-top: 12px;
-      background: #f8fafc;
-      border-radius: 14px;
-      padding: 10px 13px;
-      color: #475569;
-      line-height: 1.4;
-      font-size: 13px;
+    .line10 {
+      position: absolute;
+      bottom: calc(100% - 7px);
+      left: -18px;
+      width: 106px;
+      height: 8px;
+      background: #111827;
+      border-radius: 8px;
     }
 
-    @media (max-width: 860px) {
-      body { align-items: flex-start; padding: 6px; }
-      .game { padding: 10px; border-radius: 16px; }
-      header { grid-template-columns: 1fr; }
-      .title-box { grid-column: 1; }
-      .language-toggle { justify-self: center; order: -1; }
-      h1 { font-size: 28px; }
-      .main-layout { grid-template-columns: 1fr; }
-      .meter-panel { order: -1; }
-      .table-area { min-height: auto; }
-      .players-row { grid-template-columns: 1fr; }
-      .bottom-row { grid-template-columns: 1fr; }
-      .player-box { min-height: 170px; }
-      .cards { min-height: 100px; }
-      .card { width: 62px; height: 84px; font-size: 32px; border-width: 3px; }
-      .thinking-box { min-height: 88px; font-size: 20px; padding: 12px; }
-      .message { font-size: 18px; min-height: 70px; }
-      button { font-size: 17px; padding: 13px 8px; }
-      .meter-wrap { transform: scale(.88); margin-top: -18px; margin-bottom: -16px; }
+    .labels {
+      height: 360px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: left;
+      color: #0f172a;
+    }
+
+    .message {
+      text-align: center;
+      font-size: 24px;
+      font-weight: 900;
+      color: #7a390f;
+      min-height: 28px;
+    }
+
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+      .app { height: auto; grid-template-columns: 1fr; }
+      .top, .meterBox { grid-column: 1; }
+      .meterBox { grid-row: auto; }
+      .boards { grid-template-columns: 1fr; }
+      .actions { grid-template-columns: 1fr; }
     }
   </style>
 </head>
+
 <body>
-  <main class="game">
-    <header>
-      <div></div>
-      <div class="title-box">
-        <h1 id="title">Me Too Ten</h1>
-        <div class="subtitle" id="subtitle">Get as close as possible to 10 without going over</div>
-      </div>
-      <div class="language-toggle">
-        <button id="enBtn" onclick="setLanguage('en')">English</button>
-        <button id="heBtn" onclick="setLanguage('he')">עברית</button>
-      </div>
-    </header>
-
-    <section class="scoreboard">
-      <div class="score-pill"><span id="childWinsLabel">Child Wins</span>: <span id="childWins">0</span></div>
-      <div class="score-pill"><span id="computerWinsLabel">Computer Wins</span>: <span id="computerWins">0</span></div>
-      <div class="score-pill"><span id="tiesLabel">Ties</span>: <span id="ties">0</span></div>
+  <main class="app">
+    <section class="top">
+      <div class="hint"><span class="icon">💡</span><span>בחר את המספר<br>שהיית רוצה לקבל</span></div>
+      <div class="goal"><span class="icon">🎯</span> המטרה:<br>להגיע ל־10 בדיוק!</div>
+      <div class="pill">תיקו: <span id="ties">0</span> 🎯</div>
+      <div class="pill">ניצחונות למחשב: <span id="computerWins">0</span> 🏆</div>
+      <div class="pill">ניצחונות לילד: <span id="childWins">0</span> 📖</div>
     </section>
 
-    <section class="main-layout">
-      <div class="table-area">
-        <section class="players-row">
-          <div class="player-box">
-            <div class="player-title"><span id="computerName">Computer 🤖</span><span class="sum"><span class="totalLabel">Total</span>: <span id="computerSum">?</span></span></div>
-            <div id="computerCards" class="cards"></div>
-          </div>
-
-          <div class="player-box">
-            <div class="player-title"><span id="playerName">Player 👦</span><span class="sum"><span class="totalLabel">Total</span>: <span id="childSum">0</span></span></div>
-            <div id="childCards" class="cards"></div>
-          </div>
-        </section>
-
-        <section class="thinking-box hidden-box" id="thinkingBox"></section>
-
-        <section class="controls" style="max-width:520px;margin:0 auto;width:100%;">
-          <button class="hit" id="hitBtn" onclick="childHit()" disabled>Take Card</button>
-          <button class="stand" id="standBtn" onclick="childStand()" disabled>Stand</button>
-          <button class="new" id="newBtn" onclick="newGame()">New Game</button>
-        </section>
-
-        <section class="bottom-row">
-          <div class="message" id="message"></div>
-          <div class="message" id="message"></div>
-          <div id="statsBox" class="stats-box"></div>
-        </section>
+    <section class="boards">
+      <div class="panel">
+        <div class="title">המחשב 🤖</div>
+        <div class="badge">סכום: <span id="computerSum">0</span></div>
+        <div class="card" id="computerCard">?</div>
+        <div></div>
       </div>
 
-      <aside class="meter-panel">
-        <h2 id="tankTitle">Ten Tank</h2>
-        <div class="meter-sum"><span id="playerHasLabel">Player Has</span>: <span id="tenFrameSum">0</span></div>
-        <div class="meter-wrap">
-          <div class="overflow-zone"><div id="overflowFill" class="overflow-fill"></div></div>
-          <div class="ten-tank"><div id="tenFill" class="ten-fill"></div></div>
-          <div class="ten-line"></div>
-          <div class="label10">10</div>
-          <div class="label0">0</div>
+      <div class="panel">
+        <div class="title">הילד 👦</div>
+        <div class="badge">סכום: <span id="childSum">0</span></div>
+        <div class="card" id="childCard">?</div>
+        <div class="prob">
+          הסתברות<br>לקלף הבא:
+          <strong id="probability">100%</strong>
+          <small id="probText">מספרים 1–10</small>
         </div>
-        <div id="overflowBox" class="overflow-box"></div>
-        <div id="statsBox" class="stats-box"></div>
-      </aside>
+      </div>
     </section>
 
-    <section class="rules" id="rules"></section>
+    <aside class="meterBox">
+      <div>מיכל עשר</div>
+      <div>לילד יש: <span id="meterSum">0</span></div>
+      <div class="tubeWrap">
+        <div class="labels"><span>10</span><span>0</span></div>
+        <div class="tube">
+          <div class="fill" id="fill"></div>
+          <div class="line10"></div>
+        </div>
+      </div>
+      <div style="color:red">עד 10</div>
+    </aside>
+
+    <section class="ask">
+      <h2>🎯 איזה קלף היית רוצה לקבל עכשיו?</h2>
+      <div>בחר מספר בין 1 ל־10</div>
+      <select id="wish">
+        <option value="">בחר מספר...</option>
+        <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+      </select>
+      <div class="message" id="message">תור הילד</div>
+    </section>
+
+    <section class="actions">
+      <button class="draw" onclick="childDraw()">👂 עוד קלף<br><small>אני רוצה קלף נוסף</small></button>
+      <button class="stop" onclick="childStop()">✋ לעצור<br><small>זה המספר שבחרתי</small></button>
+      <button class="new" onclick="newGame()">✨ משחק חדש<br><small>מתחילים מהתחלה</small></button>
+    </section>
   </main>
 
   <script>
-    const text = {
-      en: {
-        title: "Me Too Ten",
-        subtitle: "Get as close as possible to 10 without going over",
-        childWins: "Child Wins",
-        computerWins: "Computer Wins",
-        ties: "Ties",
-        computer: "Computer 🤖",
-        player: "Player 👦",
-        total: "Total",
-        tank: "Ten Tank",
-        playerHas: "Player Has",
-        hit: "Take Card",
-        stand: "Stand",
-        newGame: "New Game",
-        start: "Press “New Game” to begin.",
-        oddsStart: "Odds will appear after taking a card",
-        rules: "<strong>Rules:</strong> Each card is a number from 1 to 10. The game ends when both players stop taking cards or when someone goes over 10. The player closest to 10 without going over wins.",
-        firstCard: "You got your first card. Think first, then decide: take another card or stand?",
-        nowHave: total => `You now have ${total}. Think first, then decide.` ,
-        thinking: wanted => `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%"><div style="font-size:.95em">🎯 What card would you like to get now?</div><div style="font-size:2.8em;color:#b45309;line-height:1">${wanted}</div><div style="font-size:.72em;color:#92400e">This would get you exactly to 10</div></div>`, 
-        perfectThinking: "You reached exactly 10. Great stop point! 🎉",
-        playerBust: "The player went over 10. The computer wins 🤖",
-        computerTurn: "Now it is the computer's turn...",
-        computerBust: total => `The computer went over 10 with ${total}. The player wins! 🎉`,
-        playerCloser: (child, computer) => `The player is closer to 10! ${child} vs. ${computer}. Victory! 🎉`,
-        computerCloser: (computer, child) => `The computer is closer to 10. ${computer} vs. ${child}. The computer wins 🤖`,
-        tie: total => `Both players reached ${total}. Tie! 🤝`,
-        overflow: n => `Overflow: ${n} over 10`,
-        toTen: n => `${n} to 10`,
-        stats: (safe, bust) => `If you take another card:<br>Safe cards: ${safe.length ? safe.join(", ") : "none"}<br>Chance not to bust: ${safe.length * 10}%<br>Chance to bust: ${bust.length * 10}%`
-      },
-      he: {
-        title: "גם אני עשר",
-        subtitle: "מתקרבים ל־10 בלי לעבור אותו",
-        childWins: "ניצחונות לילד",
-        computerWins: "ניצחונות למחשב",
-        ties: "תיקו",
-        computer: "המחשב 🤖",
-        player: "הילד 👦",
-        total: "סכום",
-        tank: "מיכל עשר",
-        playerHas: "לילד יש",
-        hit: "עוד קלף",
-        stand: "לעצור",
-        newGame: "משחק חדש",
-        start: "לחץ על “משחק חדש” כדי להתחיל.",
-        oddsStart: "הסיכוי יוצג אחרי קבלת קלף",
-        rules: "<strong>החוקים:</strong> כל קלף הוא מספר מ־1 עד 10. המשחק מסתיים כששני השחקנים לא רוצים עוד קלפים, או כשמישהו עבר את 10. מנצח מי שהגיע הכי קרוב ל־10 בלי לעבור.",
-        firstCard: "קיבלת קלף ראשון. קודם חושבים, ואז מחליטים: עוד קלף או לעצור?",
-        nowHave: total => `עכשיו יש לך ${total}. קודם חושבים, ואז מחליטים.` ,
-        thinking: wanted => `<div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;direction:rtl"><div style="font-size:.95em">🎯 איזה קלף היית רוצה לקבל עכשיו?</div><div style="font-size:2.8em;color:#b45309;line-height:1">${wanted}</div><div style="font-size:.72em;color:#92400e">יביא אותך בדיוק ל־10</div></div>`, 
-        perfectThinking: "הגעת בדיוק ל־10. נקודת עצירה מצוינת! 🎉",
-        playerBust: "הילד עבר את 10. המחשב ניצח 🤖",
-        computerTurn: "עכשיו תור המחשב...",
-        computerBust: total => `המחשב עבר את 10 עם ${total}. הילד ניצח! 🎉`,
-        playerCloser: (child, computer) => `הילד קרוב יותר ל־10! ${child} מול ${computer}. ניצחון! 🎉`,
-        computerCloser: (computer, child) => `המחשב קרוב יותר ל־10. ${computer} מול ${child}. המחשב ניצח 🤖`,
-        tie: total => `שניכם הגעתם ל־${total}. תיקו! 🤝`,
-        overflow: n => `חריגה: ${n} מעל 10`,
-        toTen: n => `${n} עד 10`,
-        stats: (safe, bust) => `אם תיקח עוד קלף:<br>בטוחים: ${safe.length ? safe.join(", ") : "אין"}<br>סיכוי לא לעבור: ${safe.length * 10}%<br>סיכוי לעבור: ${bust.length * 10}%`
+    let childSum = 0;
+    let computerSum = 0;
+    let childWins = 0;
+    let computerWins = 0;
+    let ties = 0;
+    let gameOver = false;
+
+    const el = id => document.getElementById(id);
+
+    function randomCard() {
+      return Math.floor(Math.random() * 10) + 1;
+    }
+
+    function updateUI() {
+      el("childSum").textContent = childSum;
+      el("computerSum").textContent = computerSum;
+      el("meterSum").textContent = childSum;
+
+      const height = Math.min(childSum, 10) * 10;
+      el("fill").style.height = height + "%";
+
+      const goodCards = Math.max(0, 10 - childSum);
+      const probability = Math.round((goodCards / 10) * 100);
+      el("probability").textContent = probability + "%";
+
+      if (goodCards <= 0) {
+        el("probText").textContent = "כבר הגעת ל־10";
+      } else {
+        el("probText").textContent = `מספרים 1–${goodCards}`;
       }
-    };
 
-    let lang = localStorage.getItem("tenGameLanguage") || ((navigator.language || "").startsWith("he") ? "he" : "en");
-    let childCards = [], computerCards = [], gameOver = true, computerHidden = true;
-    let childWins = Number(localStorage.getItem("tenGameChildWins") || 0);
-    let computerWins = Number(localStorage.getItem("tenGameComputerWins") || 0);
-    let ties = Number(localStorage.getItem("tenGameTies") || 0);
-
-    const childCardsEl = document.getElementById("childCards");
-    const computerCardsEl = document.getElementById("computerCards");
-    const childSumEl = document.getElementById("childSum");
-    const computerSumEl = document.getElementById("computerSum");
-    const messageEl = document.getElementById("message");
-    const thinkingBoxEl = document.getElementById("thinkingBox");
-    const hitBtn = document.getElementById("hitBtn");
-    const standBtn = document.getElementById("standBtn");
-    const newBtn = document.getElementById("newBtn");
-    const childWinsEl = document.getElementById("childWins");
-    const computerWinsEl = document.getElementById("computerWins");
-    const tiesEl = document.getElementById("ties");
-    const tenFrameSumEl = document.getElementById("tenFrameSum");
-    const overflowBoxEl = document.getElementById("overflowBox");
-    const statsBoxEl = document.getElementById("statsBox");
-    const tenFillEl = document.getElementById("tenFill");
-    const overflowFillEl = document.getElementById("overflowFill");
-
-    function t() { return text[lang]; }
-    function randomCard(){ return Math.floor(Math.random() * 10) + 1; }
-    function sum(cards){ return cards.reduce((total, card) => total + card, 0); }
-
-    function setLanguage(newLang) {
-      lang = newLang;
-      localStorage.setItem("tenGameLanguage", lang);
-      document.documentElement.lang = lang;
-      document.documentElement.dir = lang === "he" ? "rtl" : "ltr";
-      applyLanguage();
-      render();
+      el("childWins").textContent = childWins;
+      el("computerWins").textContent = computerWins;
+      el("ties").textContent = ties;
     }
 
-    function applyLanguage() {
-      const copy = t();
-      document.title = copy.title;
-      document.getElementById("title").textContent = copy.title;
-      document.getElementById("subtitle").textContent = copy.subtitle;
-      document.getElementById("childWinsLabel").textContent = copy.childWins;
-      document.getElementById("computerWinsLabel").textContent = copy.computerWins;
-      document.getElementById("tiesLabel").textContent = copy.ties;
-      document.getElementById("computerName").textContent = copy.computer;
-      document.getElementById("playerName").textContent = copy.player;
-      document.querySelectorAll(".totalLabel").forEach(el => el.textContent = copy.total);
-      document.getElementById("tankTitle").textContent = copy.tank;
-      document.getElementById("playerHasLabel").textContent = copy.playerHas;
-      hitBtn.textContent = copy.hit;
-      standBtn.textContent = copy.stand;
-      newBtn.textContent = copy.newGame;
-      document.getElementById("rules").innerHTML = copy.rules;
-      document.getElementById("enBtn").classList.toggle("active", lang === "en");
-      document.getElementById("heBtn").classList.toggle("active", lang === "he");
-      if (gameOver && childCards.length === 0) messageEl.textContent = copy.start;
+    function childDraw() {
+      if (gameOver) return;
+
+      const wish = el("wish").value;
+      if (!wish) {
+        el("message").textContent = "קודם בחר איזה קלף היית רוצה לקבל";
+        return;
+      }
+
+      const card = randomCard();
+      childSum += card;
+      el("childCard").textContent = card;
+
+      if (String(card) === wish) {
+        el("message").textContent = "יפה! קיבלת בדיוק את הקלף שבחרת";
+      } else {
+        el("message").textContent = "קיבלת " + card + ". עכשיו תור המחשב";
+      }
+
+      el("wish").value = "";
+      updateUI();
+
+      if (childSum === 10) {
+        endGame("child", "הגעת בדיוק ל־10! ניצחת!");
+        return;
+      }
+
+      if (childSum > 10) {
+        endGame("computer", "עברת את 10. המחשב ניצח.");
+        return;
+      }
+
+      setTimeout(computerTurn, 700);
     }
 
-    function renderCards(container, cards, hidden = false){
-      container.innerHTML = "";
-      cards.forEach((card, index) => {
-        const div = document.createElement("div");
-        div.className = "card";
-        if (hidden && index > 0) {
-          div.classList.add("back");
-          div.textContent = "?";
-        } else {
-          div.textContent = card;
+    function computerTurn() {
+      if (gameOver) return;
+
+      const card = randomCard();
+      computerSum += card;
+      el("computerCard").textContent = card;
+
+      if (computerSum === 10) {
+        updateUI();
+        endGame("computer", "המחשב הגיע בדיוק ל־10.");
+        return;
+      }
+
+      if (computerSum > 10) {
+        updateUI();
+        endGame("child", "המחשב עבר את 10. הילד ניצח!");
+        return;
+      }
+
+      el("message").textContent = "תור הילד";
+      updateUI();
+    }
+
+    function childStop() {
+      if (gameOver) return;
+
+      el("message").textContent = "הילד עצר. המחשב משחק...";
+      updateUI();
+
+      setTimeout(() => {
+        while (computerSum < 7 && computerSum < childSum) {
+          const card = randomCard();
+          computerSum += card;
+          el("computerCard").textContent = card;
         }
-        container.appendChild(div);
-      });
+
+        updateUI();
+        decideWinner();
+      }, 700);
     }
 
-    function updateScoreboard(){
-      childWinsEl.textContent = childWins;
-      computerWinsEl.textContent = computerWins;
-      tiesEl.textContent = ties;
-      localStorage.setItem("tenGameChildWins", childWins);
-      localStorage.setItem("tenGameComputerWins", computerWins);
-      localStorage.setItem("tenGameTies", ties);
-    }
+    function decideWinner() {
+      const childDistance = Math.abs(10 - childSum);
+      const computerDistance = computerSum > 10 ? 99 : Math.abs(10 - computerSum);
 
-    function renderMeter(){
-      const total = sum(childCards);
-      tenFrameSumEl.textContent = total;
-      tenFillEl.style.height = `${Math.min(total, 10) * 10}%`;
-      overflowFillEl.style.height = `${Math.min(Math.max(total - 10, 0) * 20, 100)}%`;
-      overflowBoxEl.textContent = total > 10 ? t().overflow(total - 10) : t().toTen(10 - total);
-    }
-
-    function renderStats(){
-      const total = sum(childCards);
-      if (gameOver || childCards.length === 0) {
-        statsBoxEl.textContent = t().oddsStart;
-        return;
-      }
-      const safe = [], bust = [];
-      for (let card = 1; card <= 10; card++) {
-        if (total + card <= 10) safe.push(card);
-        else bust.push(card);
-      }
-      statsBoxEl.innerHTML = t().stats(safe, bust);
-    }
-
-    function renderThinkingPrompt(){
-      const total = sum(childCards);
-      const shouldShow = !gameOver && childCards.length >= 1 && total <= 10;
-      thinkingBoxEl.classList.toggle("hidden-box", !shouldShow);
-      if (!shouldShow) {
-        thinkingBoxEl.innerHTML = "";
-        return;
-      }
-      if (total < 10) {
-        thinkingBoxEl.innerHTML = t().thinking(10 - total);
+      if (childSum > 10) {
+        endGame("computer", "הילד עבר את 10. המחשב ניצח.");
+      } else if (computerSum > 10) {
+        endGame("child", "המחשב עבר את 10. הילד ניצח!");
+      } else if (childDistance < computerDistance) {
+        endGame("child", "הילד קרוב יותר ל־10. ניצחת!");
+      } else if (computerDistance < childDistance) {
+        endGame("computer", "המחשב קרוב יותר ל־10.");
       } else {
-        thinkingBoxEl.innerHTML = t().perfectThinking;
+        endGame("tie", "תיקו! שניכם באותו מרחק מ־10.");
       }
     }
 
-    function render(){
-      renderCards(childCardsEl, childCards, false);
-      renderCards(computerCardsEl, computerCards, computerHidden && !gameOver);
-      childSumEl.textContent = sum(childCards);
-      computerSumEl.textContent = (computerHidden && !gameOver) ? "?" : sum(computerCards);
-      hitBtn.disabled = gameOver;
-      standBtn.disabled = gameOver;
-      updateScoreboard();
-      renderMeter();
-      renderStats();
-      renderThinkingPrompt();
-    }
-
-    function newGame(){
-      childCards = [randomCard()];
-      computerCards = [randomCard()];
-      gameOver = false;
-      computerHidden = true;
-      messageEl.textContent = t().firstCard;
-      render();
-    }
-
-    function childHit(){
-      if (gameOver) return;
-      childCards.push(randomCard());
-      const total = sum(childCards);
-      if (total > 10) {
-        computerHidden = false;
-        endGame(t().playerBust, "computer");
-        return;
-      }
-      messageEl.textContent = t().nowHave(total);
-      render();
-    }
-
-    function childStand(){
-      if (gameOver) return;
-      computerHidden = false;
-      thinkingBoxEl.classList.add("hidden-box");
-      messageEl.textContent = t().computerTurn;
-      render();
-      setTimeout(computerPlay, 700);
-    }
-
-    function computerPlay(){
-      const computerTotal = sum(computerCards);
-      const childTotal = sum(childCards);
-      const safe = [];
-      for (let card = 1; card <= 10; card++) {
-        if (computerTotal + card <= 10) safe.push(card);
-      }
-      const safeChance = safe.length / 10;
-      const shouldTake = (computerTotal <= 6 && safeChance >= 0.5) || (computerTotal < childTotal && safeChance >= 0.3);
-
-      if (shouldTake) {
-        computerCards.push(randomCard());
-        render();
-        if (sum(computerCards) > 10) setTimeout(decideWinner, 600);
-        else setTimeout(computerPlay, 700);
-      } else {
-        setTimeout(decideWinner, 600);
-      }
-    }
-
-    function decideWinner(){
-      const childTotal = sum(childCards);
-      const computerTotal = sum(computerCards);
-      if (computerTotal > 10) {
-        endGame(t().computerBust(computerTotal), "child");
-        return;
-      }
-      if (childTotal > computerTotal) endGame(t().playerCloser(childTotal, computerTotal), "child");
-      else if (computerTotal > childTotal) endGame(t().computerCloser(computerTotal, childTotal), "computer");
-      else endGame(t().tie(childTotal), "tie");
-    }
-
-    function endGame(message, result){
+    function endGame(winner, text) {
       gameOver = true;
-      computerHidden = false;
-      if (result === "child") childWins++;
-      else if (result === "computer") computerWins++;
-      else if (result === "tie") ties++;
-      messageEl.textContent = message;
-      render();
+      el("message").textContent = text;
+
+      if (winner === "child") childWins++;
+      if (winner === "computer") computerWins++;
+      if (winner === "tie") ties++;
+
+      updateUI();
     }
 
-    applyLanguage();
-    updateScoreboard();
-    render();
+    function newGame() {
+      childSum = 0;
+      computerSum = 0;
+      gameOver = false;
+
+      el("childCard").textContent = "?";
+      el("computerCard").textContent = "?";
+      el("wish").value = "";
+      el("message").textContent = "תור הילד";
+
+      updateUI();
+    }
+
+    updateUI();
   </script>
 </body>
 </html>
