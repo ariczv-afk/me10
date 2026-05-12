@@ -3,94 +3,91 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title> מד מרחק מעשר </title>
+  <title>מיכל עשר</title>
+
   <style>
     * { box-sizing: border-box; }
+
     body {
       margin: 0;
-      font-family: Arial, "Rubik", sans-serif;
-      background: linear-gradient(90deg,#a8f0c3,#f8fff9,#a8f0c3);
+      font-family: Arial, sans-serif;
+      background: linear-gradient(90deg, #a8f0c3, #f8fff9, #a8f0c3);
       color: #063b1d;
-      overflow: hidden;
     }
 
     .app {
-      width: min(1380px, 98vw);
-      height: 96vh;
+      width: min(1500px, 98vw);
+      min-height: 94vh;
       margin: 2vh auto;
-      background: rgba(255,255,255,.92);
+      padding: 18px;
+      background: rgba(255,255,255,.94);
       border-radius: 28px;
-      padding: 18px 22px;
       display: grid;
-      grid-template-columns: 1fr 250px;
-      grid-template-rows: auto 1fr auto;
-      gap: 14px;
-      box-shadow: 0 20px 50px rgba(0,0,0,.12);
+      grid-template-columns: 250px 1fr;
+      gap: 18px;
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: auto auto auto auto;
+      gap: 16px;
+      min-width: 0;
     }
 
     .top {
-      grid-column: 1 / 3;
       display: grid;
-      grid-template-columns: 1.2fr 1.2fr .8fr .8fr .8fr;
+      grid-template-columns: repeat(5, 1fr);
       gap: 14px;
-      align-items: center;
     }
 
-    .pill, .goal, .hint {
-      background: #f5fbf7;
-      border: 2px solid #d8f3e0;
+    .box {
+      background: #f8fffa;
+      border: 2px solid #d4f3dc;
       border-radius: 18px;
-      padding: 13px 18px;
+      padding: 14px;
       text-align: center;
-      font-size: clamp(18px, 1.8vw, 26px);
-      font-weight: 800;
+      font-size: 24px;
+      font-weight: 900;
+      min-height: 90px;
+      display: grid;
+      place-items: center;
     }
-
-    .hint {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      color: #7a390f;
-    }
-
-    .hint .icon, .goal .icon { font-size: 40px; }
 
     .boards {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 18px;
-      min-height: 0;
     }
 
-    .panel {
-      position: relative;
-      background: linear-gradient(135deg,#ffffff,#effcf5);
-      border: 2px solid #a8edbd;
+    .player {
+      min-height: 300px;
+      border: 2px solid #8bebaa;
       border-radius: 24px;
-      padding: 22px;
+      background: linear-gradient(135deg, white, #effcf5);
+      padding: 20px;
+      position: relative;
       display: grid;
-      grid-template-columns: 1fr 170px;
+      grid-template-columns: 1fr 180px;
       align-items: center;
-      min-height: 260px;
+      gap: 16px;
     }
 
-    .title {
+    .player h2 {
       position: absolute;
-      top: 22px;
+      top: 20px;
       right: 28px;
-      font-size: clamp(26px, 2.3vw, 38px);
-      font-weight: 900;
+      margin: 0;
+      font-size: 36px;
     }
 
-    .badge {
+    .sum {
       position: absolute;
       top: 24px;
       left: 28px;
       background: #dff8e8;
       border-radius: 16px;
-      padding: 12px 24px;
-      font-size: clamp(20px, 2vw, 30px);
+      padding: 12px 28px;
+      font-size: 30px;
       font-weight: 900;
     }
 
@@ -100,12 +97,12 @@
       border: 6px solid #079845;
       border-radius: 22px;
       background: white;
-      margin: 50px auto 0;
       display: grid;
       place-items: center;
-      font-size: 76px;
+      font-size: 78px;
       font-weight: 900;
       color: #087032;
+      margin: 48px auto 0;
       box-shadow: 0 14px 28px rgba(0,0,0,.16);
       position: relative;
     }
@@ -114,7 +111,7 @@
       content: "♦";
       position: absolute;
       top: 12px;
-      left: 18px;
+      left: 16px;
       color: #ff3045;
       font-size: 24px;
     }
@@ -123,7 +120,7 @@
       content: "♦";
       position: absolute;
       bottom: 12px;
-      right: 18px;
+      right: 16px;
       color: #ff3045;
       font-size: 24px;
     }
@@ -131,12 +128,12 @@
     .prob {
       background: #dff8e8;
       border-radius: 18px;
-      padding: 18px 12px;
+      padding: 18px 10px;
       text-align: center;
       font-weight: 900;
       font-size: 22px;
-      color: #09642e;
       line-height: 1.35;
+      margin-top: 55px;
     }
 
     .prob strong {
@@ -145,33 +142,37 @@
       margin: 8px 0;
     }
 
-    .ask {
-      background: linear-gradient(135deg,#fffdfa,#fff4c9);
+    .question {
       border: 3px solid #f3a000;
       border-radius: 24px;
+      background: linear-gradient(135deg, #fffdfa, #fff4c9);
       padding: 20px;
       text-align: center;
       color: #7a390f;
-      display: grid;
-      place-items: center;
-      gap: 8px;
-      min-height: 170px;
     }
 
-    .ask h2 {
-      margin: 0;
-      font-size: clamp(26px, 2.4vw, 40px);
+    .question h2 {
+      margin: 0 0 8px;
+      font-size: 34px;
     }
 
     select {
-      width: min(360px, 85%);
-      font-size: 28px;
+      width: 330px;
+      max-width: 90%;
+      font-size: 26px;
       font-weight: 900;
-      padding: 14px;
+      padding: 12px;
       border-radius: 14px;
       border: 3px solid #08a24d;
-      text-align: center;
       background: white;
+      text-align: center;
+    }
+
+    .message {
+      margin-top: 10px;
+      min-height: 30px;
+      font-size: 24px;
+      font-weight: 900;
     }
 
     .actions {
@@ -179,20 +180,26 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 18px;
       padding: 14px;
-      background: rgba(255,255,255,.75);
       border: 2px solid #e4e4e4;
       border-radius: 22px;
+      background: rgba(255,255,255,.8);
     }
 
     button {
       border: none;
       border-radius: 18px;
       padding: 18px 10px;
-      font-size: clamp(20px, 2vw, 30px);
+      font-size: 28px;
       font-weight: 900;
       color: white;
       cursor: pointer;
       box-shadow: inset 0 -5px 0 rgba(0,0,0,.18);
+    }
+
+    button small {
+      display: block;
+      font-size: 18px;
+      margin-top: 6px;
     }
 
     .draw { background: #2563eb; }
@@ -200,26 +207,24 @@
     .new { background: #16a34a; }
 
     .meterBox {
-      grid-column: 2;
-      grid-row: 2 / 4;
       border: 4px solid #079845;
       border-radius: 24px;
       background: white;
+      padding: 22px 12px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 900;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 24px 12px;
       gap: 12px;
-      font-size: 24px;
-      font-weight: 900;
     }
 
     .tubeWrap {
       display: grid;
       grid-template-columns: 40px 90px;
-      align-items: center;
       gap: 10px;
-      margin-top: 10px;
+      align-items: center;
     }
 
     .tube {
@@ -229,25 +234,16 @@
       border-radius: 28px;
       position: relative;
       overflow: hidden;
-      background: repeating-linear-gradient(to top,#fff 0 36px,#dcecff 38px 40px);
+      background: repeating-linear-gradient(to top, #fff 0 36px, #dcecff 38px 40px);
     }
 
     .fill {
       position: absolute;
       bottom: 0;
       width: 100%;
-      background: linear-gradient(#21cf62,#12a84d);
+      height: 0%;
+      background: linear-gradient(#21cf62, #12a84d);
       transition: height .4s;
-    }
-
-    .line10 {
-      position: absolute;
-      bottom: calc(100% - 7px);
-      left: -18px;
-      width: 106px;
-      height: 8px;
-      background: #111827;
-      border-radius: 8px;
     }
 
     .labels {
@@ -255,87 +251,108 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      text-align: left;
       color: #0f172a;
     }
 
-    .message {
-      text-align: center;
-      font-size: 24px;
-      font-weight: 900;
-      color: #7a390f;
-      min-height: 28px;
-    }
+    .red { color: red; }
 
-    @media (max-width: 900px) {
-      body { overflow: auto; }
-      .app { height: auto; grid-template-columns: 1fr; }
-      .top, .meterBox { grid-column: 1; }
-      .meterBox { grid-row: auto; }
-      .boards { grid-template-columns: 1fr; }
-      .actions { grid-template-columns: 1fr; }
+    @media (max-width: 950px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .meterBox {
+        order: 2;
+      }
+
+      .top,
+      .boards,
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .player {
+        grid-template-columns: 1fr;
+      }
+
+      .prob {
+        margin-top: 0;
+      }
     }
   </style>
 </head>
 
 <body>
   <main class="app">
-    <section class="top">
-      <div class="hint"><span class="icon">💡</span><span>בחר את המספר<br>שהיית רוצה לקבל</span></div>
-      <div class="goal"><span class="icon">🎯</span> המטרה:<br>להגיע ל־10 בדיוק!</div>
-      <div class="pill">תיקו: <span id="ties">0</span> 🎯</div>
-      <div class="pill">ניצחונות למחשב: <span id="computerWins">0</span> 🏆</div>
-      <div class="pill">ניצחונות לילד: <span id="childWins">0</span> 📖</div>
-    </section>
-
-    <section class="boards">
-      <div class="panel">
-        <div class="title">המחשב 🤖</div>
-        <div class="badge">סכום: <span id="computerSum">0</span></div>
-        <div class="card" id="computerCard">?</div>
-        <div></div>
-      </div>
-
-      <div class="panel">
-        <div class="title">הילד 👦</div>
-        <div class="badge">סכום: <span id="childSum">0</span></div>
-        <div class="card" id="childCard">?</div>
-        <div class="prob">
-          הסתברות<br>לקלף הבא:
-          <strong id="probability">100%</strong>
-          <small id="probText">מספרים 1–10</small>
-        </div>
-      </div>
-    </section>
 
     <aside class="meterBox">
       <div>מיכל עשר</div>
       <div>לילד יש: <span id="meterSum">0</span></div>
+
       <div class="tubeWrap">
-        <div class="labels"><span>10</span><span>0</span></div>
+        <div class="labels">
+          <span>10</span>
+          <span>0</span>
+        </div>
+
         <div class="tube">
           <div class="fill" id="fill"></div>
-          <div class="line10"></div>
         </div>
       </div>
-      <div style="color:red">עד 10</div>
+
+      <div class="red">עד 10</div>
     </aside>
 
-    <section class="ask">
-      <h2>🎯 איזה קלף היית רוצה לקבל עכשיו?</h2>
-      <div>בחר מספר בין 1 ל־10</div>
-      <select id="wish">
-        <option value="">בחר מספר...</option>
-        <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
-        <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
-      </select>
-      <div class="message" id="message">תור הילד</div>
-    </section>
+    <section class="main">
 
-    <section class="actions">
-      <button class="draw" onclick="childDraw()">👂 עוד קלף<br><small>אני רוצה קלף נוסף</small></button>
-      <button class="stop" onclick="childStop()">✋ לעצור<br><small>זה המספר שבחרתי</small></button>
-      <button class="new" onclick="newGame()">✨ משחק חדש<br><small>מתחילים מהתחלה</small></button>
+      <section class="top">
+        <div class="box">💡<br>בחר את המספר<br>שהיית רוצה לקבל</div>
+        <div class="box">🎯 המטרה:<br>להגיע ל־10 בדיוק!</div>
+        <div class="box">תיקו: <span id="ties">0</span></div>
+        <div class="box">🏆 ניצחונות למחשב:<br><span id="computerWins">0</span></div>
+        <div class="box">📖 ניצחונות לילד:<br><span id="childWins">0</span></div>
+      </section>
+
+      <section class="boards">
+        <div class="player">
+          <h2>המחשב 🤖</h2>
+          <div class="sum">סכום: <span id="computerSum">0</span></div>
+          <div class="card" id="computerCard">?</div>
+          <div></div>
+        </div>
+
+        <div class="player">
+          <h2>הילד 👦</h2>
+          <div class="sum">סכום: <span id="childSum">0</span></div>
+          <div class="card" id="childCard">?</div>
+
+          <div class="prob">
+            הסתברות<br>לקלף הבא:
+            <strong id="probability">100%</strong>
+            <small id="probText">מספרים 1–10</small>
+          </div>
+        </div>
+      </section>
+
+      <section class="question">
+        <h2>🎯 איזה קלף היית רוצה לקבל עכשיו?</h2>
+        <div>בחר מספר בין 1 ל־10</div>
+
+        <select id="wish">
+          <option value="">בחר מספר...</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+        </select>
+
+        <div class="message" id="message">תור הילד</div>
+      </section>
+
+      <section class="actions">
+        <button class="draw" onclick="childDraw()">👂 עוד קלף<small>אני רוצה קלף נוסף</small></button>
+        <button class="stop" onclick="childStop()">✋ לעצור<small>זה המספר שבחרתי</small></button>
+        <button class="new" onclick="newGame()">✨ משחק חדש<small>מתחילים מהתחלה</small></button>
+      </section>
+
     </section>
   </main>
 
@@ -358,18 +375,14 @@
       el("computerSum").textContent = computerSum;
       el("meterSum").textContent = childSum;
 
-      const height = Math.min(childSum, 10) * 10;
-      el("fill").style.height = height + "%";
+      el("fill").style.height = Math.min(childSum, 10) * 10 + "%";
 
-      const goodCards = Math.max(0, 10 - childSum);
-      const probability = Math.round((goodCards / 10) * 100);
+      const safeCards = Math.max(0, 10 - childSum);
+      const probability = Math.round((safeCards / 10) * 100);
+
       el("probability").textContent = probability + "%";
-
-      if (goodCards <= 0) {
-        el("probText").textContent = "כבר הגעת ל־10";
-      } else {
-        el("probText").textContent = `מספרים 1–${goodCards}`;
-      }
+      el("probText").textContent =
+        safeCards > 0 ? `מספרים 1–${safeCards}` : "אין קלף בטוח";
 
       el("childWins").textContent = childWins;
       el("computerWins").textContent = computerWins;
@@ -389,24 +402,16 @@
       childSum += card;
       el("childCard").textContent = card;
 
-      if (String(card) === wish) {
-        el("message").textContent = "יפה! קיבלת בדיוק את הקלף שבחרת";
-      } else {
-        el("message").textContent = "קיבלת " + card + ". עכשיו תור המחשב";
-      }
+      el("message").textContent =
+        String(card) === wish
+          ? "יפה! קיבלת בדיוק את הקלף שבחרת"
+          : `קיבלת ${card}. עכשיו תור המחשב`;
 
       el("wish").value = "";
       updateUI();
 
-      if (childSum === 10) {
-        endGame("child", "הגעת בדיוק ל־10! ניצחת!");
-        return;
-      }
-
-      if (childSum > 10) {
-        endGame("computer", "עברת את 10. המחשב ניצח.");
-        return;
-      }
+      if (childSum === 10) return endGame("child", "הגעת בדיוק ל־10! ניצחת!");
+      if (childSum > 10) return endGame("computer", "עברת את 10. המחשב ניצח.");
 
       setTimeout(computerTurn, 700);
     }
@@ -418,33 +423,26 @@
       computerSum += card;
       el("computerCard").textContent = card;
 
-      if (computerSum === 10) {
-        updateUI();
-        endGame("computer", "המחשב הגיע בדיוק ל־10.");
-        return;
-      }
+      updateUI();
 
-      if (computerSum > 10) {
-        updateUI();
-        endGame("child", "המחשב עבר את 10. הילד ניצח!");
-        return;
-      }
+      if (computerSum === 10) return endGame("computer", "המחשב הגיע בדיוק ל־10.");
+      if (computerSum > 10) return endGame("child", "המחשב עבר את 10. הילד ניצח!");
 
       el("message").textContent = "תור הילד";
-      updateUI();
     }
 
     function childStop() {
       if (gameOver) return;
 
       el("message").textContent = "הילד עצר. המחשב משחק...";
-      updateUI();
 
       setTimeout(() => {
-        while (computerSum < 7 && computerSum < childSum) {
+        while (computerSum < childSum && computerSum < 10) {
           const card = randomCard();
           computerSum += card;
           el("computerCard").textContent = card;
+
+          if (computerSum >= 10) break;
         }
 
         updateUI();
@@ -453,14 +451,13 @@
     }
 
     function decideWinner() {
-      const childDistance = Math.abs(10 - childSum);
-      const computerDistance = computerSum > 10 ? 99 : Math.abs(10 - computerSum);
+      if (childSum > 10) return endGame("computer", "הילד עבר את 10. המחשב ניצח.");
+      if (computerSum > 10) return endGame("child", "המחשב עבר את 10. הילד ניצח!");
 
-      if (childSum > 10) {
-        endGame("computer", "הילד עבר את 10. המחשב ניצח.");
-      } else if (computerSum > 10) {
-        endGame("child", "המחשב עבר את 10. הילד ניצח!");
-      } else if (childDistance < computerDistance) {
+      const childDistance = Math.abs(10 - childSum);
+      const computerDistance = Math.abs(10 - computerSum);
+
+      if (childDistance < computerDistance) {
         endGame("child", "הילד קרוב יותר ל־10. ניצחת!");
       } else if (computerDistance < childDistance) {
         endGame("computer", "המחשב קרוב יותר ל־10.");
